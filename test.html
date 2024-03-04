@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function isDateRangeIncludingCurrentMonth(startDate, endDate) {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // 月份从0开始，需要加1
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // 判断当前月份是否在日期区间内
+        if (
+          (start.getFullYear() < currentYear ||
+            (start.getFullYear() === currentYear &&
+              start.getMonth() + 1 <= currentMonth)) &&
+          (end.getFullYear() > currentYear ||
+            (end.getFullYear() === currentYear &&
+              end.getMonth() + 1 >= currentMonth))
+        ) {
+          return true;
+        }
+
+        return false;
+      }
+
+      // 示例用法
+      const startDate = "2024-03-05"; // 区间开始日期（YYYY-MM-DD格式）
+      const endDate = "2024-04-29"; // 区间结束日期（YYYY-MM-DD格式）
+
+      const isCurrentMonthIncluded = isDateRangeIncludingCurrentMonth(
+        startDate,
+        endDate
+      );
+
+      console.log(isCurrentMonthIncluded); // 输出：true
+    </script>
+  </body>
+</html>
