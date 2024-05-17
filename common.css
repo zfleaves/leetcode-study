@@ -3,7 +3,42 @@
 }
 
 .analysis {
-    width: 600px;
+    min-width: 600px;
     border: 1px solid red;
     padding: 10px;
+}
+
+.katex .textit {
+    font-style: italic;
+}
+.FN9Jv .katex {
+    color: #262626bf;
+}
+
+.gap-1 {
+    gap: .25rem;
+}
+.flex {
+    display: flex;
+}
+.elfjS {
+    --border-tertiary: #00000014;
+    --text-secondary: #0000008c;
+}
+
+.elfjS p {
+    margin-bottom: 1rem
+}
+.elfjS pre {
+    border-color: var(--border-tertiary);
+    border-left-width: 2px;
+    color: var(--text-secondary);
+    font-family: Menlo, sans-serif;
+    font-size: .875rem;
+    line-height: 1.25rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    overflow: visible;
+    padding-left: 1rem;
+    white-space: pre-wrap
 }

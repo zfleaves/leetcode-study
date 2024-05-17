@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>接雨水</title>
+    <link rel="stylesheet" href="../common.css" as="style" />
+    <style>
+        span.katex-mathml {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="elfjS" data-track-load="description_content">
+        <p>
+            给定&nbsp;<code>n</code> 个非负整数表示每个宽度为
+            <code>1</code>
+            的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+        </p>
+
+        <p>&nbsp;</p>
+
+        <p><strong>示例 1：</strong></p>
+
+        <p>
+            <img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/22/rainwatertrap.png"
+                style="height: 161px; width: 412px" />
+        </p>
+
+        <pre><strong>输入：</strong>height = [0,1,0,2,1,0,1,3,2,1,2,1]
+        <strong>输出：</strong>6
+        <strong>解释：</strong>上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 
+        </pre>
+
+        <p><strong>示例 2：</strong></p>
+
+        <pre><strong>输入：</strong>height = [4,2,0,3,2,5]
+        <strong>输出：</strong>9
+        </pre>
+
+        <p>&nbsp;</p>
+
+        <p><strong>提示：</strong></p>
+
+        <ul>
+            <li><code>n == height.length</code></li>
+            <li>
+                <code>1 &lt;= n &lt;= 2 * 10<sup>4</sup></code>
+            </li>
+            <li>
+                <code>0 &lt;= height[i] &lt;= 10<sup>5</sup></code>
+            </li>
+        </ul>
+    </div>
+    <div class="analysis">
+        <div>
+            <h3 id="-文字题解">📖 文字题解</h3>
+            <h4 id="方法一动态规划">方法一：动态规划</h4>
+            <p>对于下标 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span>，下雨后水能到达的最大高度等于下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 两边的最大高度的最小值，下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 处能接的雨水量等于下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 处的水能到达的最大高度减去 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height[i]\textit{height}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span>。</p>
+            <p>朴素的做法是对于数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span>
+                中的每个元素，分别向左和向右扫描并记录左边和右边的最大高度，然后计算每个下标位置能接的雨水量。假设数组 <span class="math math-inline"><span
+                        class="katex"><span class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 的长度为 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.4306em;"></span><span
+                                    class="mord mathnormal">n</span></span></span></span></span>，该做法需要对每个下标位置使用 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">O(n)O(n)</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal"
+                                    style="margin-right: 0.02778em;">O</span><span class="mopen">(</span><span
+                                    class="mord mathnormal">n</span><span
+                                    class="mclose">)</span></span></span></span></span> 的时间向两边扫描并得到最大高度，因此总时间复杂度是 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">O(n2)O(n^2)</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1.0641em; vertical-align: -0.25em;"></span><span
+                                    class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                    class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span
+                                        class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist"
+                                                    style="height: 0.8141em;"><span
+                                                        style="top: -3.063em; margin-right: 0.05em;"><span
+                                                            class="pstrut" style="height: 2.7em;"></span><span
+                                                            class="sizing reset-size6 size3 mtight"><span
+                                                                class="mord mtight">2</span></span></span></span></span></span></span></span><span
+                                    class="mclose">)</span></span></span></span></span>。</p>
+            <p>上述做法的时间复杂度较高是因为需要对每个下标位置都向两边扫描。如果已经知道每个位置两边的最大高度，则可以在 <span class="math math-inline"><span
+                        class="katex"><span class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal"
+                                    style="margin-right: 0.02778em;">O</span><span class="mopen">(</span><span
+                                    class="mord mathnormal">n</span><span
+                                    class="mclose">)</span></span></span></span></span> 的时间内得到能接的雨水总量。使用动态规划的方法，可以在
+                <span class="math math-inline"><span class="katex"><span class="katex-mathml">O(n)O(n)</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal"
+                                    style="margin-right: 0.02778em;">O</span><span class="mopen">(</span><span
+                                    class="mord mathnormal">n</span><span
+                                    class="mclose">)</span></span></span></span></span> 的时间内预处理得到每个位置两边的最大高度。</p>
+            <p>创建两个长度为 <span class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.4306em;"></span><span
+                                    class="mord mathnormal">n</span></span></span></span></span> 的数组 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span>。对于 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">0≤i&lt;n0 \le
+                            i&lt;n</span><span class="katex-html" aria-hidden="true"><span class="base"><span
+                                    class="strut" style="height: 0.7804em; vertical-align: -0.136em;"></span><span
+                                    class="mord">0</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.6986em; vertical-align: -0.0391em;"></span><span
+                                    class="mord mathnormal">i</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">&lt;</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut" style="height: 0.4306em;"></span><span
+                                    class="mord mathnormal">n</span></span></span></span></span>，<span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax[i]\textit{leftMax}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span> 表示下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 及其左边的位置中，<span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 的最大高度，<span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax[i]\textit{rightMax}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">rightMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span> 表示下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 及其右边的位置中，<span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 的最大高度。</p>
+            <p>显然，<span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax[0]=height[0]\textit{leftMax}[0]=\textit{height}[0]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span><span class="mopen">[</span><span
+                                    class="mord">0</span><span class="mclose">]</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord">0</span><span class="mclose">]</span></span></span></span></span>，<span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax[n−1]=height[n−1]\textit{rightMax}[n-1]=\textit{height}[n-1]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">rightMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">n</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mord">1</span><span class="mclose">]</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">n</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mord">1</span><span
+                                    class="mclose">]</span></span></span></span></span>。两个数组的其余元素的计算如下：</p>
+            <ul>
+                <li>
+                    <p>当 <span class="math math-inline"><span class="katex"><span class="katex-mathml">1≤i≤n−11 \le i
+                                    \le n-1</span><span class="katex-html" aria-hidden="true"><span class="base"><span
+                                            class="strut"
+                                            style="height: 0.7804em; vertical-align: -0.136em;"></span><span
+                                            class="mord">1</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 0.7955em; vertical-align: -0.136em;"></span><span
+                                            class="mord mathnormal">i</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 0.6667em; vertical-align: -0.0833em;"></span><span
+                                            class="mord mathnormal">n</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                        class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                            class="mord">1</span></span></span></span></span> 时，<span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax[i]=max⁡(leftMax[i−1],height[i])\textit{leftMax}[i]=\max(\textit{leftMax}[i-1],
+                                    \textit{height}[i])</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">leftMax</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mclose">]</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mop">max</span><span class="mopen">(</span><span
+                                            class="mord text"><span class="mord textit">leftMax</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span><span
+                                            class="mbin">−</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord">1</span><span class="mclose">]</span><span
+                                            class="mpunct">,</span><span class="mspace"
+                                            style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                                class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mclose">])</span></span></span></span></span>；</p>
+                </li>
+                <li>
+                    <p>当 <span class="math math-inline"><span class="katex"><span class="katex-mathml">0≤i≤n−20 \le i
+                                    \le n-2</span><span class="katex-html" aria-hidden="true"><span class="base"><span
+                                            class="strut"
+                                            style="height: 0.7804em; vertical-align: -0.136em;"></span><span
+                                            class="mord">0</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 0.7955em; vertical-align: -0.136em;"></span><span
+                                            class="mord mathnormal">i</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 0.6667em; vertical-align: -0.0833em;"></span><span
+                                            class="mord mathnormal">n</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                        class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                            class="mord">2</span></span></span></span></span> 时，<span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">rightMax[i]=max⁡(rightMax[i+1],height[i])\textit{rightMax}[i]=\max(\textit{rightMax}[i+1],
+                                    \textit{height}[i])</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">rightMax</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mclose">]</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                        class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mop">max</span><span class="mopen">(</span><span
+                                            class="mord text"><span class="mord textit">rightMax</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span><span
+                                            class="mbin">+</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord">1</span><span class="mclose">]</span><span
+                                            class="mpunct">,</span><span class="mspace"
+                                            style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                                class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord mathnormal">i</span><span
+                                            class="mclose">])</span></span></span></span></span>。</p>
+                </li>
+            </ul>
+            <p>因此可以正向遍历数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 得到数组 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span>
+                的每个元素值，反向遍历数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 得到数组 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span> 的每个元素值。
+            </p>
+            <p>在得到数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span>
+                的每个元素值之后，对于 <span class="math math-inline"><span class="katex"><span class="katex-mathml">0≤i&lt;n0 \le
+                            i&lt;n</span><span class="katex-html" aria-hidden="true"><span class="base"><span
+                                    class="strut" style="height: 0.7804em; vertical-align: -0.136em;"></span><span
+                                    class="mord">0</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">≤</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.6986em; vertical-align: -0.0391em;"></span><span
+                                    class="mord mathnormal">i</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">&lt;</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut" style="height: 0.4306em;"></span><span
+                                    class="mord mathnormal">n</span></span></span></span></span>，下标 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 处能接的雨水量等于 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">min⁡(leftMax[i],rightMax[i])−height[i]\min(\textit{leftMax}[i],\textit{rightMax}[i])-\textit{height}[i]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mop">min</span><span class="mopen">(</span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span class="mclose">]</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                        class="mord textit">rightMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span class="mclose">])</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span>。遍历每个下标位置即可得到能接的雨水总量。</p>
+            <p>动态规划做法可以由下图体现。</p>
+            <p><img src="https://assets.leetcode-cn.com/solution-static/42/1.png" alt="fig1"></p>
+            <div class="border-gray-3 dark:border-dark-gray-3 mb-6 overflow-hidden rounded-lg border text-sm">
+                <div class="flex select-none bg-layer-2 dark:bg-dark-layer-2">
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Java</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Golang</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-1 dark:text-dark-label-1 EoHqa">
+                        JavaScript</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Python3</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C++</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C</div>
+                </div>
+                <div class="px-3 py-2.5 bg-fill-3 dark:bg-dark-fill-3">
+                    <div class="group relative" translate="no">
+                        <pre
+                            style="color: black; font-size: 13px; text-shadow: none; font-family: Menlo, Monaco, Consolas; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 4; hyphens: none; padding: 0px; margin: 0px; overflow: auto; background: transparent; overflow-wrap: normal;"><code class="language-javascript" style="text-shadow: none; white-space: pre;"><span><span class="token" style="color: rgb(0, 119, 170);">var</span><span> </span><span class="token function-variable" style="color: rgb(221, 74, 104);">trap</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">function</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token parameter">height</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">const</span><span> n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token property-access" style="">length</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span style="">
+            </span></span><span><span>    </span><span class="token control-flow" style="color: rgb(0, 119, 170);">if</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">==</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        </span><span class="token control-flow" style="color: rgb(0, 119, 170);">return</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span style="">
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span>
+            </span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">const</span><span> leftMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">new</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Array</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>n</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token method property-access" style="color: rgb(221, 74, 104);">fill</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    leftMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token control-flow" style="color: rgb(0, 119, 170);">for</span><span style=""> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">let</span><span style=""> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span style=""> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span style=""> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&lt;</span><span> n</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">++</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        leftMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span style=""> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span style=""> </span><span class="token known-class-name" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token method property-access" style="color: rgb(221, 74, 104);">max</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span style="">leftMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span style="">i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span style=""> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span style=""> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span>
+            </span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">const</span><span> rightMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">new</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Array</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>n</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token method property-access" style="color: rgb(221, 74, 104);">fill</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    rightMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span style="">n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span style=""> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span style=""> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span style=""> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token control-flow" style="color: rgb(0, 119, 170);">for</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">let</span><span style=""> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">2</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span style=""> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&gt;=</span><span style=""> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">--</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        rightMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span style=""> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span style=""> </span><span class="token known-class-name" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token method property-access" style="color: rgb(221, 74, 104);">max</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span style="">rightMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span style="">i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">+</span><span style=""> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span>
+            </span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">let</span><span> ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token control-flow" style="color: rgb(0, 119, 170);">for</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">let</span><span style=""> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&lt;</span><span> n</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">++</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">+=</span><span> </span><span class="token known-class-name" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token method property-access" style="color: rgb(221, 74, 104);">min</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>leftMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span style="">i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> rightMax</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span style=""> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span style=""> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>    </span><span class="token control-flow" style="color: rgb(0, 119, 170);">return</span><span> ans</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span></span><span class="token" style="color: rgb(153, 153, 153);">}</span><span class="token" style="color: rgb(153, 153, 153);">;</span></span></code></pre>
+                        <div class="absolute -right-1.5 -top-0.5 flex gap-2">
+                            <div
+                                class="z-base-1 hidden rounded border group-hover:block border-border-quaternary dark:border-border-quaternary bg-layer-02 dark:bg-layer-02">
+                                <div class="relative cursor-pointer flex h-[22px] w-[22px] items-center justify-center bg-layer-02 dark:bg-layer-02 hover:bg-fill-tertiary dark:hover:bg-fill-tertiary rounded-[4px]"
+                                    data-state="closed">
+                                    <div>
+                                        <div data-state="closed">
+                                            <div
+                                                class="relative text-[12px] leading-[normal] p-[1px] before:block before:h-3 before:w-3 h-3.5 w-3.5 text-text-primary dark:text-text-primary">
+                                                <svg aria-hidden="true" focusable="false" data-prefix="far"
+                                                    data-icon="clone"
+                                                    class="svg-inline--fa fa-clone absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M64 464H288c8.8 0 16-7.2 16-16V384h48v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h64v48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM224 304H448c8.8 0 16-7.2 16-16V64c0-8.8-7.2-16-16-16H224c-8.8 0-16 7.2-16 16V288c0 8.8 7.2 16 16 16zm-64-16V64c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V288c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64z">
+                                                    </path>
+                                                </svg></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p><strong>复杂度分析</strong></p>
+            <ul>
+                <li>
+                    <p>时间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord mathnormal">n</span><span
+                                            class="mclose">)</span></span></span></span></span>，其中 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 是数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        的长度。计算数组 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">leftMax</span></span></span></span></span></span> 和
+                        <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">rightMax</span></span></span></span></span></span>
+                        的元素值各需要遍历数组 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        一次，计算能接的雨水总量还需要遍历一次。</p>
+                </li>
+                <li>
+                    <p>空间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord mathnormal">n</span><span
+                                            class="mclose">)</span></span></span></span></span>，其中 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 是数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        的长度。需要创建两个长度为 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">nn</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut" style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 的数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">leftMax</span></span></span></span></span></span> 和
+                        <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">rightMax</span></span></span></span></span></span>。
+                    </p>
+                </li>
+            </ul>
+            <h4 id="方法二单调栈">方法二：单调栈</h4>
+            <p>除了计算并存储每个位置两边的最大高度以外，也可以用单调栈计算能接的雨水总量。</p>
+            <p>维护一个单调栈，单调栈存储的是下标，满足从栈底到栈顶的下标对应的数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 中的元素递减。</p>
+            <p>从左到右遍历数组，遍历到下标 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">ii</span><span class="katex-html" aria-hidden="true"><span
+                                class="base"><span class="strut" style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 时，如果栈内至少有两个元素，记栈顶元素为
+                <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">top\textit{top}</span><span class="katex-html" aria-hidden="true"><span
+                                class="base"><span class="strut"
+                                    style="height: 0.8095em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">top</span></span></span></span></span></span>，<span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">top\textit{top}</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8095em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">top</span></span></span></span></span></span> 的下面一个元素是 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span></span></span></span></span>，则一定有 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height[left]≥height[top]\textit{height}[\textit{left}] \ge
+                            \textit{height}[\textit{top}]</span><span class="katex-html" aria-hidden="true"><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord text"><span class="mord textit">left</span></span><span
+                                    class="mclose">]</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">≥</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord text"><span class="mord textit">top</span></span><span
+                                    class="mclose">]</span></span></span></span></span>。如果 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height[i]&gt;height[top]\textit{height}[i]&gt;\textit{height}[\textit{top}]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">&gt;</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord text"><span class="mord textit">top</span></span><span
+                                    class="mclose">]</span></span></span></span></span>，则得到一个可以接雨水的区域，该区域的宽度是 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">i−left−1i-\textit{left}-1</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.7429em; vertical-align: -0.0833em;"></span><span
+                                    class="mord mathnormal">i</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.7778em; vertical-align: -0.0833em;"></span><span
+                                    class="mord text"><span class="mord textit">left</span></span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                    class="mord">1</span></span></span></span></span>，高度是 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">min⁡(height[left],height[i])−height[top]\min(\textit{height}[\textit{left}],\textit{height}[i])-\textit{height}[\textit{top}]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mop">min</span><span class="mopen">(</span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord text"><span class="mord textit">left</span></span><span
+                                    class="mclose">]</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span class="mclose">])</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord text"><span class="mord textit">top</span></span><span
+                                    class="mclose">]</span></span></span></span></span>，根据宽度和高度即可计算得到该区域能接的雨水量。</p>
+            <p>为了得到 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span></span></span></span></span>，需要将 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">top\textit{top}</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8095em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">top</span></span></span></span></span></span> 出栈。在对 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">top\textit{top}</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8095em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">top</span></span></span></span></span></span>
+                计算能接的雨水量之后，<span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span></span></span></span></span> 变成新的 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">top\textit{top}</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8095em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">top</span></span></span></span></span></span>，重复上述操作，直到栈变为空，或者栈顶下标对应的
+                <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">height</span></span></span></span></span></span> 中的元素大于或等于
+                <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height[i]\textit{height}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">height</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span>。</p>
+            <p>在对下标 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 处计算能接的雨水量之后，将 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span>
+                入栈，继续遍历后面的下标，计算能接的雨水量。遍历结束之后即可得到能接的雨水总量。</p>
+            <p>下面用一个例子 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height=[0,1,0,2,1,0,1,3,2,1,2,1]\textit{height}=[0,1,0,2,1,0,1,3,2,1,2,1]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span class="mord textit">height</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span
+                                    class="mspace" style="margin-right: 0.1667em;"></span><span
+                                    class="mord">1</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">0</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">0</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">3</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mclose">]</span></span></span></span></span> 来帮助读者理解单调栈的做法。</p>
+            <div class="select-none">
+                <div class="cursor-pointer overflow-hidden whitespace-nowrap"><img class="no-preview w-full"
+                        src="https://assets.leetcode-cn.com/solution-static/42/f1.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f2.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f3.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f4.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f5.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f6.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f7.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f8.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f9.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f10.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f11.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f12.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f13.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f14.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f15.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f16.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f17.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f18.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f19.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f20.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/f21.png" alt=""></div>
+                <div
+                    class="flex items-center justify-between bg-black px-2.5 py-2 text-white dark:bg-white dark:text-black">
+                    <svg class="mr-auto h-5 w-5 cursor-pointer" height="24" viewBox="0 0 24 24" width="24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="m8 5v14l11-7z" fill="currentColor"></path>
+                    </svg><svg class="h-5 w-5 cursor-pointer" height="24" viewBox="0 0 24 24" width="24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="m18 18-8.5-6 8.5-6zm-10-12v12h-2v-12z" fill="currentColor"></path>
+                    </svg><span class="mx-5 text-xs">1 / 21</span><svg class="h-5 w-5 cursor-pointer" height="24"
+                        viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="m6 18 8.5-6-8.5-6zm10-12v12h2v-12z" fill="currentColor"></path>
+                    </svg></div>
+            </div>
+            <div class="border-gray-3 dark:border-dark-gray-3 mb-6 overflow-hidden rounded-lg border text-sm">
+                <div class="flex select-none bg-layer-2 dark:bg-dark-layer-2">
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-1 dark:text-dark-label-1 EoHqa">
+                        Java</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Golang</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        JavaScript</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Python3</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C++</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C</div>
+                </div>
+                <div class="px-3 py-2.5 bg-fill-3 dark:bg-dark-fill-3">
+                    <div class="group relative" translate="no">
+                        <pre
+                            style="color: black; font-size: 13px; text-shadow: none; font-family: Menlo, Monaco, Consolas; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 4; hyphens: none; padding: 0px; margin: 0px; overflow: auto; background: transparent; overflow-wrap: normal;"><code class="language-java" style="text-shadow: none; white-space: pre;"><span><span class="token" style="color: rgb(0, 119, 170);">class</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Solution</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">public</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">trap</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">int</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(221, 74, 104);">Deque</span><span class="token generics" style="color: rgb(153, 153, 153);">&lt;</span><span class="token generics" style="color: rgb(221, 74, 104);">Integer</span><span class="token generics" style="color: rgb(153, 153, 153);">&gt;</span><span> stack </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">new</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">LinkedList</span><span class="token generics" style="color: rgb(153, 153, 153);">&lt;</span><span class="token generics" style="color: rgb(221, 74, 104);">Integer</span><span class="token generics" style="color: rgb(153, 153, 153);">&gt;</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> n </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span>length</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">for</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&lt;</span><span> n</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">++</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>            </span><span class="token" style="color: rgb(0, 119, 170);">while</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">!</span><span>stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">isEmpty</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&amp;&amp;</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&gt;</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">peek</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> top </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">pop</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(0, 119, 170);">if</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">isEmpty</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>                    </span><span class="token" style="color: rgb(0, 119, 170);">break</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> left </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">peek</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> currWidth </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> i </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> left </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> currHeight </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">min</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>left</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>top</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">+=</span><span> currWidth </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">*</span><span> currHeight</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>            </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>            stack</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">push</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>i</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">return</span><span> ans</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span></span><span class="token" style="color: rgb(153, 153, 153);">}</span></span></code></pre>
+                        <div class="absolute -right-1.5 -top-0.5 flex gap-2">
+                            <div
+                                class="z-base-1 hidden rounded border group-hover:block border-border-quaternary dark:border-border-quaternary bg-layer-02 dark:bg-layer-02">
+                                <div class="relative cursor-pointer flex h-[22px] w-[22px] items-center justify-center bg-layer-02 dark:bg-layer-02 hover:bg-fill-tertiary dark:hover:bg-fill-tertiary rounded-[4px]"
+                                    data-state="closed">
+                                    <div>
+                                        <div data-state="closed">
+                                            <div
+                                                class="relative text-[12px] leading-[normal] p-[1px] before:block before:h-3 before:w-3 h-3.5 w-3.5 text-text-primary dark:text-text-primary">
+                                                <svg aria-hidden="true" focusable="false" data-prefix="far"
+                                                    data-icon="clone"
+                                                    class="svg-inline--fa fa-clone absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M64 464H288c8.8 0 16-7.2 16-16V384h48v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h64v48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM224 304H448c8.8 0 16-7.2 16-16V64c0-8.8-7.2-16-16-16H224c-8.8 0-16 7.2-16 16V288c0 8.8 7.2 16 16 16zm-64-16V64c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V288c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64z">
+                                                    </path>
+                                                </svg></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p><strong>复杂度分析</strong></p>
+            <ul>
+                <li>
+                    <p>时间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord mathnormal">n</span><span
+                                            class="mclose">)</span></span></span></span></span>，其中 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 是数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        的长度。从 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">00</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                            class="mord">0</span></span></span></span></span> 到 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">n−1n-1</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6667em; vertical-align: -0.0833em;"></span><span
+                                            class="mord mathnormal">n</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                        class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                            class="mord">1</span></span></span></span></span> 的每个下标最多只会入栈和出栈各一次。</p>
+                </li>
+                <li>
+                    <p>空间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord mathnormal">n</span><span
+                                            class="mclose">)</span></span></span></span></span>，其中 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 是数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        的长度。空间复杂度主要取决于栈空间，栈的大小不会超过 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">nn</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut" style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span>。</p>
+                </li>
+            </ul>
+            <h4 id="方法三双指针">方法三：双指针</h4>
+            <p>动态规划的做法中，需要维护两个数组 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span>，因此空间复杂度是
+                <span class="math math-inline"><span class="katex"><span class="katex-mathml">O(n)O(n)</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal"
+                                    style="margin-right: 0.02778em;">O</span><span class="mopen">(</span><span
+                                    class="mord mathnormal">n</span><span
+                                    class="mclose">)</span></span></span></span></span>。是否可以将空间复杂度降到 <span
+                    class="math math-inline"><span class="katex"><span class="katex-mathml">O(1)O(1)</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal"
+                                    style="margin-right: 0.02778em;">O</span><span class="mopen">(</span><span
+                                    class="mord">1</span><span class="mclose">)</span></span></span></span></span>？</p>
+            <p>注意到下标 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ii</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6595em;"></span><span
+                                    class="mord mathnormal">i</span></span></span></span></span> 处能接的雨水量由 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax[i]\textit{leftMax}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax[i]\textit{rightMax}[i]</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span class="mord text"><span
+                                        class="mord textit">rightMax</span></span><span class="mopen">[</span><span
+                                    class="mord mathnormal">i</span><span
+                                    class="mclose">]</span></span></span></span></span> 中的最小值决定。由于数组 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 是从左往右计算，数组
+                <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span>
+                是从右往左计算，因此可以使用双指针和两个变量代替两个数组。</p>
+            <p>维护两个指针 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">right\textit{right}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">right</span></span></span></span></span></span>，以及两个变量 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span>，初始时 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left=0,right=n−1,leftMax=0,rightMax=0\textit{left}=0,\textit{right}=n-1,\textit{leftMax}=0,\textit{rightMax}=0</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord">0</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                        class="mord textit">right</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.6667em; vertical-align: -0.0833em;"></span><span
+                                    class="mord mathnormal">n</span><span class="mspace"
+                                    style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span
+                                    class="mspace" style="margin-right: 0.2222em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord">1</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord">0</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord text"><span
+                                        class="mord textit">rightMax</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                    class="mord">0</span></span></span></span></span>。指针 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">left</span></span></span></span></span></span> 只会向右移动，指针
+                <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">right\textit{right}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">right</span></span></span></span></span></span>
+                只会向左移动，在移动指针的过程中维护两个变量 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.6944em;"></span><span class="mord text"><span
+                                        class="mord textit">leftMax</span></span></span></span></span></span> 和 <span
+                    class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                            aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span
+                                        class="mord textit">rightMax</span></span></span></span></span></span> 的值。</p>
+            <p>当两个指针没有相遇时，进行如下操作：</p>
+            <ul>
+                <li>
+                    <p>使用 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height[left]\textit{height}[\textit{left}]</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">left</span></span><span
+                                            class="mclose">]</span></span></span></span></span> 和 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height[right]\textit{height}[\textit{right}]</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">right</span></span><span
+                                            class="mclose">]</span></span></span></span></span> 的值更新 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax\textit{leftMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">leftMax</span></span></span></span></span></span> 和
+                        <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">rightMax\textit{rightMax}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">rightMax</span></span></span></span></span></span>
+                        的值；</p>
+                </li>
+                <li>
+                    <p>如果 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height[left]&lt;height[right]\textit{height}[\textit{left}]&lt;\textit{height}[\textit{right}]</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">left</span></span><span class="mclose">]</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span><span
+                                            class="mrel">&lt;</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">right</span></span><span
+                                            class="mclose">]</span></span></span></span></span>，则必有 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax&lt;rightMax\textit{leftMax}&lt;\textit{rightMax}</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.7335em; vertical-align: -0.0391em;"></span><span
+                                            class="mord text"><span class="mord textit">leftMax</span></span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span><span
+                                            class="mrel">&lt;</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span></span><span class="base"><span
+                                            class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">rightMax</span></span></span></span></span></span>，下标
+                        <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">left</span></span></span></span></span></span>
+                        处能接的雨水量等于 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax−height[left]\textit{leftMax}-\textit{height}[\textit{left}]</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.7778em; vertical-align: -0.0833em;"></span><span
+                                            class="mord text"><span class="mord textit">leftMax</span></span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span><span
+                                            class="mbin">−</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">left</span></span><span
+                                            class="mclose">]</span></span></span></span></span>，将下标 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">left</span></span></span></span></span></span>
+                        处能接的雨水量加到能接的雨水总量，然后将 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">left\textit{left}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6944em;"></span><span class="mord text"><span
+                                                class="mord textit">left</span></span></span></span></span></span> 加
+                        <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6444em;"></span><span
+                                            class="mord">1</span></span></span></span></span>（即向右移动一位）；</p>
+                </li>
+                <li>
+                    <p>如果 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height[left]≥height[right]\textit{height}[\textit{left}] \ge
+                                    \textit{height}[\textit{right}]</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">left</span></span><span class="mclose">]</span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span><span
+                                            class="mrel">≥</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">right</span></span><span
+                                            class="mclose">]</span></span></span></span></span>，则必有 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">leftMax≥rightMax\textit{leftMax} \ge
+                                    \textit{rightMax}</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut"
+                                            style="height: 0.8304em; vertical-align: -0.136em;"></span><span
+                                            class="mord text"><span class="mord textit">leftMax</span></span><span
+                                            class="mspace" style="margin-right: 0.2778em;"></span><span
+                                            class="mrel">≥</span><span class="mspace"
+                                            style="margin-right: 0.2778em;"></span></span><span class="base"><span
+                                            class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">rightMax</span></span></span></span></span></span>，下标
+                        <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">right\textit{right}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">right</span></span></span></span></span></span>
+                        处能接的雨水量等于 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">rightMax−height[right]\textit{rightMax}-\textit{height}[\textit{right}]</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span class="mord textit">rightMax</span></span><span
+                                            class="mspace" style="margin-right: 0.2222em;"></span><span
+                                            class="mbin">−</span><span class="mspace"
+                                            style="margin-right: 0.2222em;"></span></span><span class="base"><span
+                                            class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord text"><span class="mord textit">height</span></span><span
+                                            class="mopen">[</span><span class="mord text"><span
+                                                class="mord textit">right</span></span><span
+                                            class="mclose">]</span></span></span></span></span>，将下标 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">right\textit{right}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">right</span></span></span></span></span></span>
+                        处能接的雨水量加到能接的雨水总量，然后将 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">right\textit{right}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">right</span></span></span></span></span></span> 减
+                        <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.6444em;"></span><span
+                                            class="mord">1</span></span></span></span></span>（即向左移动一位）。</p>
+                </li>
+            </ul>
+            <p>当两个指针相遇时，即可得到能接的雨水总量。</p>
+            <p>下面用一个例子 <span class="math math-inline"><span class="katex"><span
+                            class="katex-mathml">height=[0,1,0,2,1,0,1,3,2,1,2,1]\textit{height}=[0,1,0,2,1,0,1,3,2,1,2,1]</span><span
+                            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                    style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                    class="mord text"><span class="mord textit">height</span></span><span class="mspace"
+                                    style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span
+                                    class="mspace" style="margin-right: 0.2778em;"></span></span><span
+                                class="base"><span class="strut"
+                                    style="height: 1em; vertical-align: -0.25em;"></span><span
+                                    class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span
+                                    class="mspace" style="margin-right: 0.1667em;"></span><span
+                                    class="mord">1</span><span class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">0</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">0</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">3</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">2</span><span
+                                    class="mpunct">,</span><span class="mspace"
+                                    style="margin-right: 0.1667em;"></span><span class="mord">1</span><span
+                                    class="mclose">]</span></span></span></span></span> 来帮助读者理解双指针的做法。</p>
+            <div class="select-none">
+                <div class="cursor-pointer overflow-hidden whitespace-nowrap"><img class="no-preview w-full"
+                        src="https://assets.leetcode-cn.com/solution-static/42/p1.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p2.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p3.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p4.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p5.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p6.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p7.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p8.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p9.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p10.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p11.png" alt=""><img
+                        class="no-preview w-full" hidden=""
+                        src="https://assets.leetcode-cn.com/solution-static/42/p12.png" alt=""></div>
+                <div
+                    class="flex items-center justify-between bg-black px-2.5 py-2 text-white dark:bg-white dark:text-black">
+                    <svg class="mr-auto h-5 w-5 cursor-pointer" height="24" viewBox="0 0 24 24" width="24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="m8 5v14l11-7z" fill="currentColor"></path>
+                    </svg><svg class="h-5 w-5 cursor-pointer" height="24" viewBox="0 0 24 24" width="24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="m18 18-8.5-6 8.5-6zm-10-12v12h-2v-12z" fill="currentColor"></path>
+                    </svg><span class="mx-5 text-xs">1 / 12</span><svg class="h-5 w-5 cursor-pointer" height="24"
+                        viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="m6 18 8.5-6-8.5-6zm10-12v12h2v-12z" fill="currentColor"></path>
+                    </svg></div>
+            </div>
+            <div class="border-gray-3 dark:border-dark-gray-3 mb-6 overflow-hidden rounded-lg border text-sm">
+                <div class="flex select-none bg-layer-2 dark:bg-dark-layer-2">
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-1 dark:text-dark-label-1 EoHqa">
+                        Java</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Golang</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        JavaScript</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        Python3</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C++</div>
+                    <div
+                        class="font-menlo relative flex h-10 cursor-pointer items-center justify-center px-3 font-medium transition-all text-label-4 dark:text-dark-label-4 hover:text-label-1 dark:hover:text-dark-label-1 EoHqa">
+                        C</div>
+                </div>
+                <div class="px-3 py-2.5 bg-fill-3 dark:bg-dark-fill-3">
+                    <div class="group relative" translate="no">
+                        <pre
+                            style="color: black; font-size: 13px; text-shadow: none; font-family: Menlo, Monaco, Consolas; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 4; hyphens: none; padding: 0px; margin: 0px; overflow: auto; background: transparent; overflow-wrap: normal;"><code class="language-java" style="text-shadow: none; white-space: pre;"><span><span class="token" style="color: rgb(0, 119, 170);">class</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Solution</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(0, 119, 170);">public</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">trap</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span class="token" style="color: rgb(0, 119, 170);">int</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> left </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> right </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span>length </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">1</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">int</span><span> leftMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> rightMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(153, 0, 85);">0</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">while</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>left </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&lt;</span><span> right</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>            leftMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">max</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>leftMax</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>left</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>            rightMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">=</span><span> </span><span class="token" style="color: rgb(221, 74, 104);">Math</span><span class="token" style="color: rgb(153, 153, 153);">.</span><span class="token" style="color: rgb(221, 74, 104);">max</span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>rightMax</span><span class="token" style="color: rgb(153, 153, 153);">,</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>right</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>            </span><span class="token" style="color: rgb(0, 119, 170);">if</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">(</span><span>height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>left</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span> </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">&lt;</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>right</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">)</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>                ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">+=</span><span> leftMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>left</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">++</span><span>left</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>            </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span> </span><span class="token" style="color: rgb(0, 119, 170);">else</span><span> </span><span class="token" style="color: rgb(153, 153, 153);">{</span><span>
+            </span></span><span><span>                ans </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">+=</span><span> rightMax </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">-</span><span> height</span><span class="token" style="color: rgb(153, 153, 153);">[</span><span>right</span><span class="token" style="color: rgb(153, 153, 153);">]</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>                </span><span class="token" style="color: rgb(154, 110, 58); background: rgba(255, 255, 255, 0.5);">--</span><span>right</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>            </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span>        </span><span class="token" style="color: rgb(0, 119, 170);">return</span><span> ans</span><span class="token" style="color: rgb(153, 153, 153);">;</span><span>
+            </span></span><span><span>    </span><span class="token" style="color: rgb(153, 153, 153);">}</span><span>
+            </span></span><span><span></span><span class="token" style="color: rgb(153, 153, 153);">}</span></span></code></pre>
+                        <div class="absolute -right-1.5 -top-0.5 flex gap-2">
+                            <div
+                                class="z-base-1 hidden rounded border group-hover:block border-border-quaternary dark:border-border-quaternary bg-layer-02 dark:bg-layer-02">
+                                <div class="relative cursor-pointer flex h-[22px] w-[22px] items-center justify-center bg-layer-02 dark:bg-layer-02 hover:bg-fill-tertiary dark:hover:bg-fill-tertiary rounded-[4px]"
+                                    data-state="closed">
+                                    <div>
+                                        <div data-state="closed">
+                                            <div
+                                                class="relative text-[12px] leading-[normal] p-[1px] before:block before:h-3 before:w-3 h-3.5 w-3.5 text-text-primary dark:text-text-primary">
+                                                <svg aria-hidden="true" focusable="false" data-prefix="far"
+                                                    data-icon="clone"
+                                                    class="svg-inline--fa fa-clone absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path fill="currentColor"
+                                                        d="M64 464H288c8.8 0 16-7.2 16-16V384h48v64c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h64v48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM224 304H448c8.8 0 16-7.2 16-16V64c0-8.8-7.2-16-16-16H224c-8.8 0-16 7.2-16 16V288c0 8.8 7.2 16 16 16zm-64-16V64c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V288c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64z">
+                                                    </path>
+                                                </svg></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p><strong>复杂度分析</strong></p>
+            <ul>
+                <li>
+                    <p>时间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(n)O(n)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord mathnormal">n</span><span
+                                            class="mclose">)</span></span></span></span></span>，其中 <span
+                            class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span
+                                    class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span> 是数组 <span
+                            class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">height\textit{height}</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 0.8889em; vertical-align: -0.1944em;"></span><span
+                                            class="mord text"><span
+                                                class="mord textit">height</span></span></span></span></span></span>
+                        的长度。两个指针的移动总次数不超过 <span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">nn</span><span class="katex-html" aria-hidden="true"><span
+                                        class="base"><span class="strut" style="height: 0.4306em;"></span><span
+                                            class="mord mathnormal">n</span></span></span></span></span>。</p>
+                </li>
+                <li>
+                    <p>空间复杂度：<span class="math math-inline"><span class="katex"><span
+                                    class="katex-mathml">O(1)O(1)</span><span class="katex-html"
+                                    aria-hidden="true"><span class="base"><span class="strut"
+                                            style="height: 1em; vertical-align: -0.25em;"></span><span
+                                            class="mord mathnormal" style="margin-right: 0.02778em;">O</span><span
+                                            class="mopen">(</span><span class="mord">1</span><span
+                                            class="mclose">)</span></span></span></span></span>。只需要使用常数的额外空间。</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </div>
+    <script>
+        /**
+         * @param {number[]} height
+         * @return {number}
+         */
+         var trap = function(height) {
+            const n = height.length;
+            if (n == 0) {
+                return 0;
+            }
+
+            const leftMax = new Array(n).fill(0);
+            leftMax[0] = height[0];
+            for (let i = 1; i < n; ++i) {
+                leftMax[i] = Math.max(leftMax[i - 1], height[i]);
+            }
+
+            const rightMax = new Array(n).fill(0);
+            rightMax[n - 1] = height[n - 1];
+            for (let i = n - 2; i >= 0; --i) {
+                rightMax[i] = Math.max(rightMax[i + 1], height[i]);
+            }
+            
+            console.log('rightMax: ', rightMax);
+            console.log('leftMax: ', leftMax);
+            let ans = 0;
+            for (let i = 0; i < n; ++i) {
+                ans += Math.min(leftMax[i], rightMax[i]) - height[i];
+            }
+            return ans;
+        };
+
+        const height = [0,1,0,2,1,0,1,3,2,1,2,1];
+        const result = trap(height);
+        console.log("result: ", result);
+    </script>
+</body>
+
+</html>

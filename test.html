@@ -7,39 +7,24 @@
   </head>
   <body>
     <script>
-      function isDateRangeIncludingCurrentMonth(startDate, endDate) {
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth() + 1; // 月份从0开始，需要加1
-
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-
-        // 判断当前月份是否在日期区间内
-        if (
-          (start.getFullYear() < currentYear ||
-            (start.getFullYear() === currentYear &&
-              start.getMonth() + 1 <= currentMonth)) &&
-          (end.getFullYear() > currentYear ||
-            (end.getFullYear() === currentYear &&
-              end.getMonth() + 1 >= currentMonth))
-        ) {
-          return true;
+      var removeElement = function (nums, val) {
+        let left = 0,
+          right = nums.length;
+        while (left < right) {
+          if (nums[left] === val) {
+            nums[left] = nums[right - 1];
+            right--;
+          } else {
+            left++;
+          }
         }
-
-        return false;
-      }
-
-      // 示例用法
-      const startDate = "2024-03-05"; // 区间开始日期（YYYY-MM-DD格式）
-      const endDate = "2024-04-29"; // 区间结束日期（YYYY-MM-DD格式）
-
-      const isCurrentMonthIncluded = isDateRangeIncludingCurrentMonth(
-        startDate,
-        endDate
-      );
-
-      console.log(isCurrentMonthIncluded); // 输出：true
+        console.log('nums: ', nums);
+        return left;
+      };
+      const nums = [3, 2, 2, 3];
+      const val = 3;
+      const result = removeElement(nums, val);
+      console.log("result: ", result);
     </script>
   </body>
 </html>

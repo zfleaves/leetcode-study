@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最长公共前缀</title>
+    <link rel="stylesheet" href="../common.css" as="style" />
+    <style>
+        span.katex-mathml {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="elfjS" data-track-load="description_content"><p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
+
+        <p>如果不存在公共前缀，返回空字符串&nbsp;<code>""</code>。</p>
+        
+        <p>&nbsp;</p>
+        
+        <p><strong class="example">示例 1：</strong></p>
+        
+        <pre><strong>输入：</strong>strs = ["flower","flow","flight"]
+        <strong>输出：</strong>"fl"
+        </pre>
+        
+        <p><strong class="example">示例 2：</strong></p>
+        
+        <pre><strong>输入：</strong>strs = ["dog","racecar","car"]
+        <strong>输出：</strong>""
+        <strong>解释：</strong>输入不存在公共前缀。</pre>
+        
+        <p>&nbsp;</p>
+        
+        <p><strong>提示：</strong></p>
+        
+        <ul>
+            <li><code>1 &lt;= strs.length &lt;= 200</code></li>
+            <li><code>0 &lt;= strs[i].length &lt;= 200</code></li>
+            <li><code>strs[i]</code> 仅由小写英文字母组成</li>
+        </ul>
+        </div>
+    <div class="analysis">
+    </div>
+    </div>
+    <script>
+        /**
+         * @param {string[]} strs
+         * @return {string}
+         */
+        var longestCommonPrefix = function(strs) {
+            if (strs.length === 0) return ''
+            if (strs.length === 1) return strs[0]
+            let res = strs[0]
+            for (ch of strs) {
+                for (let i = 0; i < res.length; i++) {
+                    if (ch[i] !== res[i]) {
+                        res = res.slice(0, i)
+                        break
+                    }
+                }
+            }
+            return result
+        };
+        const strs  = ["flower","flow","flight"]
+        const strs1  = ["dog","racecar","car"];
+        const result = longestCommonPrefix(strs1);
+        console.log("result: ", result);
+    </script>
+</body>
+
+</html>
