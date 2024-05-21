@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>有效的括号</title>
+    <link rel="stylesheet" href="../common.css" as="style" />
+    <style>
+        span.katex-mathml {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="elfjS" data-track-load="description_content"><p>给定一个只包括 <code>'('</code>，<code>')'</code>，<code>'{'</code>，<code>'}'</code>，<code>'['</code>，<code>']'</code>&nbsp;的字符串 <code>s</code> ，判断字符串是否有效。</p>
+
+        <p>有效字符串需满足：</p>
+        
+        <ol>
+            <li>左括号必须用相同类型的右括号闭合。</li>
+            <li>左括号必须以正确的顺序闭合。</li>
+            <li>每个右括号都有一个对应的相同类型的左括号。</li>
+        </ol>
+        
+        <p>&nbsp;</p>
+        
+        <p><strong>示例 1：</strong></p>
+        
+        <pre><strong>输入：</strong>s = "()"
+        <strong>输出：</strong>true
+        </pre>
+        
+        <p><strong>示例&nbsp;2：</strong></p>
+        
+        <pre><strong>输入：</strong>s = "()[]{}"
+        <strong>输出：</strong>true
+        </pre>
+        
+        <p><strong>示例&nbsp;3：</strong></p>
+        
+        <pre><strong>输入：</strong>s = "(]"
+        <strong>输出：</strong>false
+        </pre>
+        
+        <p>&nbsp;</p>
+        
+        <p><strong>提示：</strong></p>
+        
+        <ul>
+            <li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>
+            <li><code>s</code> 仅由括号 <code>'()[]{}'</code> 组成</li>
+        </ul>
+        </div>
+    <div class="analysis">
+        <h4 id="方法一栈">方法一：栈</h4>
+        <p>判断括号的有效性可以使用「栈」这一数据结构来解决。</p>
+        <p>我们遍历给定的字符串 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span></span>。当我们遇到一个左括号时，我们会期望在后续的遍历中，有一个相同类型的右括号将其闭合。由于<strong>后遇到的左括号要先闭合</strong>，因此我们可以将这个左括号放入栈顶。</p>
+        <p>当我们遇到一个右括号时，我们需要将一个相同类型的左括号闭合。此时，我们可以取出栈顶的左括号并判断它们是否是相同类型的括号。如果不是相同的类型，或者栈中并没有左括号，那么字符串 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span></span> 无效，返回 <span class="math math-inline"><span class="katex"><span class="katex-mathml">False\text{False}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord text"><span class="mord">False</span></span></span></span></span></span>。为了快速判断括号的类型，我们可以使用哈希表存储每一种括号。哈希表的键为右括号，值为相同类型的左括号。</p>
+        <p>在遍历结束后，如果栈中没有左括号，说明我们将字符串 <span class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span></span> 中的所有左括号闭合，返回 <span class="math math-inline"><span class="katex"><span class="katex-mathml">True\text{True}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord text"><span class="mord">True</span></span></span></span></span></span>，否则返回 <span class="math math-inline"><span class="katex"><span class="katex-mathml">False\text{False}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord text"><span class="mord">False</span></span></span></span></span></span>。</p>
+        <p>注意到有效字符串的长度一定为偶数，因此如果字符串的长度为奇数，我们可以直接返回 <span class="math math-inline"><span class="katex"><span class="katex-mathml">False\text{False}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mord text"><span class="mord">False</span></span></span></span></span></span>，省去后续的遍历判断过程。</p>
+    </div>
+    </div>
+    <script>
+        /**
+         * @param {string} s
+         * @return {boolean}
+         */
+        var isValid = function(s) {
+            const n = s.length
+            if (n % 2 === 1) return false
+            const map = new Map([
+                [')', '('],
+                ['}', '{'],
+                [']', '[']
+            ])
+            let stk = [] // 采用进栈出栈
+            for (let ch of s) {
+                if (map.has(ch)) {
+                    const n = stk.length
+                    if (!n || stk[n - 1] !== map.get(ch)) {
+                        return false
+                    }
+                    stk.pop()
+                } else {
+                    stk.push(ch)
+                }
+            }
+            return !stk.length
+        };
+        const s = "([{{}}])"
+        const result = isValid(s);
+        console.log("result: ", result);
+    </script>
+</body>
+
+</html>

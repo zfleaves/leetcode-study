@@ -3,29 +3,33 @@ function cloneDeep(obj, hash = new WeakMap()) {
   if (obj === null) return obj;
   if (obj instanceof Date) return new Date(obj);
   if (obj instanceof RegExp) return new RegExp(obj);
-  if (typeof obj === "object") return obj;
-  if (hash.get(obj)) return hash.get(obj);
-  const cloneObj = new obj.constructor();
-  console.log("cloneObj: ", cloneObj);
+  if (typeof obj !== "object") return obj;
+  if (hash.get(obj)) {
+    return hash.get(obj);
+  }
+  // 创建一个新的对象或数组
+  let cloneObj = Array.isArray(obj) ? [] : {};
+  // console.log("cloneObj: ", cloneObj);
   hash.set(obj, cloneObj);
+  // 循环递归复制所有属性或元素
   for (let key in obj) {
-    if (obj.hasOwnproperyy(key)) {
-      // 实现一个递归拷贝
-      cloneObj[key] = cloneDeep(obj[key], hash);
+    if (obj.hasOwnProperty(key)) {
+      cloneObj[key] = cloneDeep(obj[key], hash); // 递归调用
     }
   }
   return cloneObj;
 }
 
+// 使用示例
 const obj = {
-  name: "A",
-  name1: undefined,
-  name3: function () {},
-  name4: Symbol("A"),
-  name5: {
-    a: 1,
-    b: 2
-  }
+  a: 1,
+  b: {
+    c: 2,
+    d: [3, 4],
+    e: new Date(),
+  },
+  f: [5, 6, { g: 7 }],
+  h: /hello/g,
 };
 
 // 会忽略undefined、symbol和函数
