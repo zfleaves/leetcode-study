@@ -1,0 +1,217 @@
+<!--
+ * @Date: 2023-11-17 19:56:50
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-05-19 22:05:29
+ * @FilePath: \leetcode-study\简单\index-205.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>同构字符串</title>
+    <link rel="stylesheet" href="../common.css" />
+</head>
+
+<body>
+    <div class="elfjS" data-track-load="description_content">
+        <p>给定两个字符串&nbsp;<code>s</code>&nbsp;和&nbsp;<code>t</code>&nbsp;，判断它们是否是同构的。</p>
+
+        <p>如果&nbsp;<code>s</code>&nbsp;中的字符可以按某种映射关系替换得到&nbsp;<code>t</code>&nbsp;，那么这两个字符串是同构的。</p>
+
+        <p>每个出现的字符都应当映射到另一个字符，同时不改变字符的顺序。不同字符不能映射到同一个字符上，相同字符只能映射到同一个字符上，字符可以映射到自己本身。</p>
+
+        <p>&nbsp;</p>
+
+        <p><strong>示例 1:</strong></p>
+
+        <pre><strong>输入：</strong>s = <code>"egg"</code>, t = <code>"add"</code>
+        <strong>输出：</strong>true
+        </pre>
+
+        <p><strong>示例 2：</strong></p>
+
+        <pre><strong>输入：</strong>s = <code>"foo"</code>, t = <code>"bar"</code>
+        <strong>输出：</strong>false</pre>
+
+        <p><strong>示例 3：</strong></p>
+
+        <pre><strong>输入：</strong>s = <code>"paper"</code>, t = <code>"title"</code>
+        <strong>输出：</strong>true</pre>
+
+        <p>&nbsp;</p>
+
+        <p><strong>提示：</strong></p>
+
+        <p>
+            <meta charset="UTF-8">
+        </p>
+
+        <ul>
+            <li><code>1 &lt;= s.length &lt;= 5 * 10<sup>4</sup></code></li>
+            <li><code>t.length == s.length</code></li>
+            <li><code>s</code>&nbsp;和&nbsp;<code>t</code>&nbsp;由任意有效的 ASCII 字符组成</li>
+        </ul>
+    </div>
+    <div class="analysis">
+        <h4 id="方法一哈希表">方法一：哈希表</h4>
+        <p>此题是「<a href="https://leetcode-cn.com/problems/word-pattern/" target="_blank">290. 单词规律</a>」的简化版，需要我们判断 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span> 和 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 每个位置上的字符是否都一一对应，即 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span> 的任意一个字符被 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 中唯一的字符对应，同时 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 的任意一个字符被 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span> 中唯一的字符对应。这也被称为「双射」的关系。</p>
+        <p>以示例 <span class="math math-inline"><span class="katex"><span class="katex-mathml">22</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6444em;"></span><span class="mord">2</span></span></span></span></span>
+            为例，<span class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 中的字符 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">aa</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">a</span></span></span></span></span> 和 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">rr</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span class="mord mathnormal"
+                                style="margin-right: 0.02778em;">r</span></span></span></span></span> 虽然有唯一的映射 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">oo</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">o</span></span></span></span></span>，但对于 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span> 中的字符 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">oo</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">o</span></span></span></span></span> 来说其存在两个映射 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">{a,r}\{a,r\}</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 1em; vertical-align: -0.25em;"></span><span class="mopen">{</span><span
+                                class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace"
+                                style="margin-right: 0.1667em;"></span><span class="mord mathnormal"
+                                style="margin-right: 0.02778em;">r</span><span
+                                class="mclose">}</span></span></span></span></span>，故不满足条件。</p>
+        <p>因此，我们维护两张哈希表，第一张哈希表 <span class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">s2t\textit{s2t}</span><span class="katex-html" aria-hidden="true"><span
+                            class="base"><span class="strut" style="height: 0.6444em;"></span><span
+                                class="mord text"><span
+                                    class="mord textit">s2t</span></span></span></span></span></span> 以 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span> 中字符为键，映射至 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 的字符为值，第二张哈希表 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">t2s\textit{t2s}</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6444em;"></span><span class="mord text"><span
+                                    class="mord textit">t2s</span></span></span></span></span></span> 以 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">tt</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6151em;"></span><span
+                                class="mord mathnormal">t</span></span></span></span></span> 中字符为键，映射至 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">ss</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.4306em;"></span><span
+                                class="mord mathnormal">s</span></span></span></span></span>
+            的字符为值。从左至右遍历两个字符串的字符，不断更新两张哈希表，如果出现冲突（即当前下标 <span class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">index\textit{index}</span><span class="katex-html" aria-hidden="true"><span
+                            class="base"><span class="strut" style="height: 0.6944em;"></span><span
+                                class="mord text"><span
+                                    class="mord textit">index</span></span></span></span></span></span> 对应的字符 <span
+                class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">s[index]s[\textit{index}]</span><span class="katex-html"
+                        aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 1em; vertical-align: -0.25em;"></span><span
+                                class="mord mathnormal">s</span><span class="mopen">[</span><span
+                                class="mord text"><span class="mord textit">index</span></span><span
+                                class="mclose">]</span></span></span></span></span> 已经存在映射且不为 <span
+                class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">t[index]t[\textit{index}]</span><span class="katex-html"
+                        aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 1em; vertical-align: -0.25em;"></span><span
+                                class="mord mathnormal">t</span><span class="mopen">[</span><span
+                                class="mord text"><span class="mord textit">index</span></span><span
+                                class="mclose">]</span></span></span></span></span> 或当前下标 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">index\textit{index}</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6944em;"></span><span class="mord text"><span
+                                    class="mord textit">index</span></span></span></span></span></span> 对应的字符 <span
+                class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">t[index]t[\textit{index}]</span><span class="katex-html"
+                        aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 1em; vertical-align: -0.25em;"></span><span
+                                class="mord mathnormal">t</span><span class="mopen">[</span><span
+                                class="mord text"><span class="mord textit">index</span></span><span
+                                class="mclose">]</span></span></span></span></span> 已经存在映射且不为 <span
+                class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">s[index]s[\textit{index}]</span><span class="katex-html"
+                        aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 1em; vertical-align: -0.25em;"></span><span
+                                class="mord mathnormal">s</span><span class="mopen">[</span><span
+                                class="mord text"><span class="mord textit">index</span></span><span
+                                class="mclose">]</span></span></span></span></span>）时说明两个字符串无法构成同构，返回 <span
+                class="math math-inline"><span class="katex"><span class="katex-mathml">false\rm false</span><span
+                        class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                                style="height: 0.6944em;"></span><span class="mord"><span
+                                    class="mord mathrm">false</span></span></span></span></span></span>。</p>
+        <p>如果遍历结束没有出现冲突，则表明两个字符串是同构的，返回 <span class="math math-inline"><span class="katex"><span
+                        class="katex-mathml">true\rm true</span><span class="katex-html" aria-hidden="true"><span
+                            class="base"><span class="strut" style="height: 0.6151em;"></span><span class="mord"><span
+                                    class="mord mathrm">true</span></span></span></span></span></span> 即可。</p>
+    </div>
+    <script>
+        /**
+         * @param {string} s
+         * @param {string} t
+         * @return {boolean}
+         */
+        var isIsomorphic = function (s, t) {
+            const s2t = {};
+            const t2s = {};
+            const n = s.length
+            for (let i = 0; i < n; ++i) {
+                const x = s[i]
+                const y = t[i]
+                if (s2t[x] && s2t[x] !== y || t2s[y] && t2s[y] !== x) {
+                    return false
+                }
+                s2t[x] = y
+                t2s[y] = x
+            }
+            return true
+        };
+        const s = "foo"
+        const t = "bar"
+        const result = isIsomorphic(s, t);
+        console.log("result: ", result);
+    </script>
+</body>
+
+</html>
