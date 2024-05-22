@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-05-22 22:04:14
  * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2024-05-22 22:10:46
+ * @LastEditTime: 2024-05-22 22:23:03
  * @FilePath: \leetcode-study\TypeScript\generic programming.ts
  */
 // 假设我们用一个函数，它可接受一个 number 参数并返回一个number 参数，如下写法：
@@ -113,6 +113,7 @@ class Demo<T extends ChildInterface> {
     }
 }
 // 交叉类型（Intersection Types） 这可以通过 & 符号来实现
+
 class Demo1<T extends FirstInterface & SecondInterface> {
     private genericProperty: T
 
