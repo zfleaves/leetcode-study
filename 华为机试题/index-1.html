@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>在学校中,N个小朋友站成一队 单调栈的应用</title>
+    <link rel="stylesheet" href="../common.css" as="style" />
+    <style>
+        span.katex-mathml {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="elfjS" data-track-load="description_content"><p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
+
+        在学校中，N个小朋友站成一队， 第i个小朋友的身高为height[i]，
+        第i个小朋友可以看到的第一个比自己身高更高的小朋友j，那么j是i的好朋友(要求j>i)。
+        请重新生成一个列表，对应位置的输出是每个小朋友的好朋友位置，如果没有看到好朋友，请在该位置用0代替。
+        小朋友人数范围是 [0, 40000]。
+        <br />
+        代码说明：
+        ①小朋友位置编号从1开始，0表示没有朋友，1表示朋友的位置为1
+        <br />
+        请输入孩子个数：6
+        <br />
+        请输入孩子身高：1 8 6 5 2 7（注意：1是位置编号为1的孩子身高，8是位置编号为2的孩子的身高）
+        <br />
+        2 0 6 6 6 0
+    </div>
+    <div class="analysis">
+    </div>
+    </div>
+    <script>
+        /**
+         * @param {string[]} strs
+         * @return {string}
+         */
+         function findFriends(heights) {  
+            const n = heights.length;  
+            const friends = new Array(n).fill(0); // 初始化一个长度为n的数组，全部填充为0  
+            const stack = []; // 单调递减栈，存储小朋友的索引  
+        
+            for (let i = 0; i < n; i++) {  
+                // 当栈不为空且当前小朋友的身高高于栈顶小朋友时  
+                while (stack.length > 0 && heights[i] > heights[stack[stack.length - 1]]) {  
+                    // 栈顶小朋友找到了他的好朋友  
+                    const j = stack.pop();  
+                    friends[j] = i + 1; // 注意索引从0开始，而题目要求从1开始，所以需要+1  
+                }  
+                stack.push(i); // 当前小朋友入栈  
+            }  
+        
+            return friends;  
+        }  
+        
+        // 示例用法  
+        const heights = [1, 8, 6, 5, 2, 7]; // 示例身高数组  
+        const result = findFriends(heights);  
+        console.log("result: ", result);
+    </script>
+</body>
+
+</html>
