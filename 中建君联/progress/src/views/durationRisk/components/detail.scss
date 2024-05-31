@@ -1,0 +1,155 @@
+.materialVarieties{
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+      .materialVarieties-cont{
+          width: 100%;
+          display: flex;
+          height: calc(100% - 42px);
+          .left{
+              flex: 5;
+              max-width: 50%;
+              margin-right: 20px;
+              max-height: 100%;
+              .title{
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin: 10px 0;
+                  .title-name{
+                      min-width: 100px;
+                      width: 40%;
+                  }
+              }
+          }
+          .right{
+              flex: 5;
+              max-width: 50%;
+              max-height: 100%;
+              .title{
+                  align-items: center;
+                  // height: 36px;
+                  margin: 10px 0;
+              }
+          }
+      }
+}
+.cons {
+  background-color: #fff;
+  color: #303133;
+  padding: 10px;
+  transition: .3s;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  position: relative;
+  .content {
+      position: relative;
+      width: 100%;
+  }
+}
+.treeTitle {
+    height: 40px;
+    width: calc(100% - 2px);
+    display: flex;
+    border: 1px solid #EBEEF5;
+    background: #fafafa;
+    line-height: 40px;
+    color: #909399;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    .classifyName {
+      width: calc(100% - 950px);
+      padding-left: 10px;
+      box-sizing: border-box;
+    }
+    .classifyCode {
+      width: 150px;
+    }
+    .classifyDiscription{
+      width: 200px;
+    }
+    .createByName{
+      width: 100px;
+    }
+    .updateByName{
+      width: 100px;
+    }
+    .updateTime{
+      width: 120px;
+    }
+    .sorts{
+      width: 100px;
+    }
+    .operate {
+      width: 180px;
+      text-align: center;
+    }
+}
+.treeCons {
+    flex: 1;
+    width: calc(100% - 2px);
+    position: relative;
+    // background: pink;
+    border: 1px solid #EBEEF5;
+    border-top: 0;
+    /deep/ .el-tree-node__content {
+        height: 40px;
+        line-height: 40px;
+        border-bottom: 1px solid #EBEEF5;
+    }
+    .custom-tree-node {
+        // display: flex;
+        flex-direction: row;
+        height: 100%;
+        flex: 1;
+        text-align: left;
+        .classifyName {
+          float: left;
+          height: 100%;
+          width: calc(100% - 950px);
+        }
+        .classifyCode {
+          width: 150px;
+          height: 100%;
+          float: left;
+        }
+        .classifyDiscription{
+          width: 200px;
+          height: 100%;
+          float: left;
+        }
+        .createByName{
+          width: 100px;
+          height: 100%;
+          float: left;
+        }
+        .updateByName{
+          width: 100px;
+          height: 100%;
+          float: left;
+        }
+        .updateTime{
+          width: 120px;
+          height: 100%;
+          float: left;
+        }
+        .sorts{
+          width: 100px;
+          height: 100%;
+          float: left;
+        }
+        .operate {
+          width: 180px;
+          height: 100%;
+        }
+    }
+}
+.imgUrlList{
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+}

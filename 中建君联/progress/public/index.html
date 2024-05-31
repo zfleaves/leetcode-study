@@ -1,0 +1,44 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-07-13 09:00:28
+ * @LastEditTime: 2022-02-28 09:46:33
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \web_unit\public\index.html
+--> 
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <script src="gantt/dhtmlxgantt.js?v=7.0.11"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js?v=7.0.11"></script> -->
+    <script src="gantt/Chart.js"></script>
+    <script src="gantt/locale/locale_cn.js"></script>
+    <!-- <script src="https://export.dhtmlx.com/gantt/api.js?v=7.0.11"></script> -->
+    <!-- <script src="https://export.dhtmlx.com/beta/gantt/api.js?v=7.0.11"></script> -->
+    <script src="gantt/exportApi.js"></script>
+    <script src="gantt/exportBetaApi.js"></script>
+    <script src="gantt/common/snippets/dhx_file_dnd.js?v=7.0.11"></script>
+    <link rel="stylesheet" href="gantt/common/snippets/dhx_file_dnd.css?v=7.0.11">
+    <link rel="stylesheet" href="gantt/common/controls_styles.css?v=7.0.11">
+    <link rel="stylesheet" href="gantt/dhtmlxgantt.css?v=7.0.11">
+    <title>项目进度云</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <script LANGUAGE="JavaScript">
+      window.alert = function(str) {
+        return;
+      }
+    </script>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1917819_ttl3tj2714p.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1297632_npmzts4mni.css">
+    <!-- built files will be auto injected -->
+  </body>
+</html>

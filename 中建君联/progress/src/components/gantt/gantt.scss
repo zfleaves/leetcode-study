@@ -1,0 +1,52 @@
+// 甘特图样式
+.gantt {
+    width: 100%;
+    height: calc(100% - 46px);
+    // height: auto;
+    // min-height: 600px;
+    .gantt_tree_content {
+        .set {
+            margin: 0 4px;
+            cursor: pointer;
+        }
+    }
+    .firstLevelTask {
+        // border: none;
+        .gantt_task_content {
+            // font-weight: bold;
+            font-size: 13px;
+        }
+    }
+}
+// 工作时间设置
+.gantt_task_cell.week_end {
+    background-color: #EFF5FD;
+}
+
+.gantt_task_cell {
+    &.weekend {
+        background-color: #EFF5FD;
+    }
+}
+
+// 项目工期
+.gantt_task_line.gantt_dependent_task {
+    background-color: #65c16f;
+    border: 1px solid #3c9445;
+
+}
+.gantt_task_line.gantt_dependent_task .gantt_task_progress {
+    background-color: #46ad51;
+}
+
+.gantt_task_row.gantt_selected .gantt_task_cell.week_end {
+    background-color: #F8EC9C;
+}
+.dhtmlx-error {
+    display: none !important;
+}
+
+// 进度条
+.hide_project_progress_drag .gantt_task_progress_drag {
+    visibility: hidden;
+}
