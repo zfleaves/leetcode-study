@@ -96,9 +96,6 @@ export default {
         const range = document.createRange()
         range.setStart(cellChild, 0)
         range.setEnd(cellChild, cellChild.childNodes.length)
-        const rangeWidth = range.getBoundingClientRect().width
-        // console.log('rangeWidth: ', rangeWidth)
-        // rangeWidth > cellChild.offsetWidth ||
         if (
           cellChild.scrollWidth > cellChild.offsetWidth &&
           this.$refs.tooltip
@@ -116,10 +113,6 @@ export default {
         return
       }
       const computedStyle = window.getComputedStyle(cellChild)
-      const lineHeight = parseInt(
-        computedStyle.getPropertyValue('line-height'),
-        10
-      )
       var contentHeight = cellChild.scrollHeight
       if (
         contentHeight > parseInt(computedStyle.height, 10) &&

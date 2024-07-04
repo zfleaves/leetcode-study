@@ -159,3 +159,17 @@
   const asuna = new Gamer("Asuna", 20);
   asuna.getName(); // 成功访问到父类的方法
 }
+
+
+(function a () {
+  console.log('a1', a)
+  a = 3
+  console.log('a2', a)
+}())
+
+var b = function() {
+  console.log('b1', b)
+  b = 3
+  console.log('b2', b)
+}
+b()

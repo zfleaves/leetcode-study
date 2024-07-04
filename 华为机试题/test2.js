@@ -1,3 +1,9 @@
+/*
+ * @Date: 2024-05-31 21:30:57
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-02 16:52:54
+ * @FilePath: \leetcode-study\华为机试题\test2.js
+ */
 function sumSurvivors(nums, jump, left) {  
     // 创建一个数组来记录哪些数字是幸存的  
     let survivors = new Array(nums.length).fill(true);  
@@ -5,7 +11,7 @@ function sumSurvivors(nums, jump, left) {
     // 跳跃和淘汰的循环  
     let currentIndex = 0
     let step = 0
-    while (nums.length > left && step < 10) {  
+    while (nums.length > left) {  
         const nextIndex = (currentIndex + jump + 1) % nums.length
         currentIndex = nextIndex  - 1
         nums.splice(nextIndex, 1)

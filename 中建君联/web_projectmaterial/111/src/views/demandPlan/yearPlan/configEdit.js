@@ -1,0 +1,191 @@
+/*
+ * @Author: your name
+ * @Date: 2020-07-24 15:16:00
+ * @LastEditTime: 2022-01-10 14:48:33
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \web_projectmaterial\src\views\demandPlan\yearPlan\configEdit.js
+ */
+import Utils from 'util';
+
+const PageConfig = {
+  // 流程
+  processParmas: {
+    // 获取下一个节点的处理人信息
+    nextInfo: {
+      url: 'yearPlan/getWorkflowNextNode',
+      parmasList: [
+        {receive: 'sid', value: 'taskSid'},
+        {receive: 'projectId', value: 'projectId'}
+      ]
+    },
+    // 流程审批
+    approveSubmit: {
+      url: 'yearPlan/setWorkflowApprove'
+    },
+    // 删除
+    deleteParams: {
+      url: 'yearPlan/setDelete',
+      params: 'yearPlanId'
+    },
+    // 删除明细
+    deleteDetailsParams: {
+      url: 'yearPlan/setDeleteDetails'
+    },
+    // info
+    infoUrl: {
+      url: 'yearPlan/getInfo',
+      params: 'yearPlanId'
+    },
+    // save
+    saveUrl: {
+      url: 'yearPlan/setEdit'
+    },
+    exportDetail: {
+      url: 'yearPlan/exportDetail',
+      params: 'yearPlanId'
+    }
+  },
+    // 数据字典
+    dictionary: [
+        {dicCode: 'currencyType', propCode: 'currencyCode'}
+    ],
+    // 接口数据
+    selectList: [],
+    // 主表
+    mainFormConfig: {
+        formList: [
+            // 单据编号
+            { label: 'fConfig.docNo', prop: 'docNo', span: 8, formType: 'input', inputStatus: 'disable', placeholder: 'tips.automaticGeneration',
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 填写人
+            { label: 'fConfig.createByName', prop: 'createByName', span: 8, formType: 'input', inputStatus: 'disable', placeholder: 'tips.automaticGeneration',
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 填写日期
+            { label: 'fConfig.createTime', prop: 'createTime', span: 8, formType: 'date', inputStatus: 'disable', placeholder: 'tips.automaticGeneration',
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 项目名称
+            { label: 'fConfig.projectName', prop: 'projectName', span: 8, formType: 'project', key: 'projectId',
+              isRelation: true,
+              relationList: [{receive: 'projectCode', value: 'projectCode'},
+                              { receive: 'partyAUnitId', value: 'partyAUnitId' },
+                              {receive: 'partyAUnitName', value: 'partyAUnitName'}],
+              isRule: true, check: true,
+              relationTable: ['demandYearPlanDetail'],
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 项目编号
+            { label: 'fConfig.projectCode', prop: 'projectCode', span: 8, formType: 'input', inputStatus: 'disable',
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 甲方单位
+            { label: 'fConfig.partyA', prop: 'partyAUnitName', span: 8, formType: 'input', inputStatus: 'disable',
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 填报年度
+            { label: 'yearPlan.applyYear', prop: 'applyYear', span: 8, formType: 'year', isRule: true,
+              relationTable: ['demandYearPlanDetail'], isRelation: true, isRelationTable: true, clearable: false,
+              printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 申请原因(备注)
+            { label: 'yearPlan.remarks', prop: 'remarks', span: 16, formType: 'textarea', maxlength: 256,
+              printWidth: 16, printFlag: true, defaultFlag: true, printStatus: 0
+            },
+            // 附件
+            { label: 'fConfig.attachment', prop: 'attachment', span: 24, formType: 'upload'}
+        ],
+        oldRelationList: []
+    },
+    subTableMatch: [
+      {value: 'yearPlanDetails', assignment: 'demandYearPlanDetail'}
+    ],
+    // 子表
+    subTableConfig: {
+      // 明细清单
+      demandYearPlanDetail: {
+          subTableName: 'demandYearPlanDetail',
+          titleTips: 'demandYearPlanDetailTips',
+          isSelection: true,
+          // 子表按钮
+        subTableButton: [
+            // 删除明细
+            {noAuth: true, code: 'sysHandleDeletaBatch', subTableCode: 'demandYearPlanDetail', disabled: false},
+            // 导出明细
+           { noAuth: true, code: 'sysHandleExportDetail', subTableCode: 'demandYearPlanDetail', name: 'button.export', authCode: 'export' },
+            // 选择明细
+            { noAuth: true, code: 'sysHandleSelectDetail', subTableCode: 'demandYearPlanDetail', disabled: false }
+          ],
+          tableList: {
+              // 表头配置
+              slaveColumns: [
+                  // 材料编码
+                  { label: 'fConfig.varietiesCode', prop: 'varietiesCode', formType: 'text', maxlength: 64, minWidth: 120,
+                    printWidth: 10, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 材料名称
+                  { label: 'fConfig.varietiesName', prop: 'varietiesName', formType: 'text', maxlength: 32,
+                    printWidth: 12, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 规格
+                  { label: 'fConfig.standards', prop: 'standards', formType: 'text', maxlength: 32, minWidth: 160,
+                    printWidth: 12, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 计量单位
+                  { label: 'fConfig.unit', prop: 'unit', formType: 'text', minWidth: 80,
+                    printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  //  预算数量
+                  { label: 'yearPlan.budgetQuantity', prop: 'budgetQuantity', formType: 'text', filterName: 'number', minWidth: 100,
+                    printWidth: 10, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  //  已申请数量
+                  { label: 'yearPlan.alreadyApplyQuantity', prop: 'alreadyApplyQuantity', formType: 'text', filterName: 'number', minWidth: 120,
+                    printWidth: 12, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  //  年度需求数量
+                  { label: 'yearPlan.currentApplyQuantity', prop: 'currentApplyQuantity', formType: 'number', operateData: true, precision: 4, maxlength: 12, minWidth: 120,
+                    printWidth: 12, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 物资类别
+                  {
+                    label: 'fConfig.materialClassifyValue', prop: 'materialClassifyValue', formType: 'text', minWidth: 100,
+                    printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 拟供应来源
+                  {
+                    label: 'fConfig.supplySourceValue', prop: 'supplySourceValue', formType: 'text', minWidth: 100,
+                    printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 专业
+                  {
+                    label: 'fConfig.majorValue', prop: 'majorValue', formType: 'text', minWidth: 100,
+                    printWidth: 8, printFlag: true, defaultFlag: true, printStatus: 0
+                  },
+                  // 备注
+                  { label: 'fConfig.remarks', prop: 'remarks', formType: 'input', maxlength: 255,
+                    printWidth: 12, printFlag: false, defaultFlag: false, printStatus: 0
+                  }
+              ],
+              // 校验
+              rules: {},
+              // 初始化行数据
+              tableDataRow: {}
+          }, // 子表配置
+          tableData: [] // 子表数据
+      }
+    }
+};
+class Page {
+  constructor() {
+    this.PageConfig = JSON.parse(JSON.stringify(PageConfig));
+    this.init();
+  }
+  init () {
+    Utils.commonUtil.getSelectList(this.PageConfig.selectList, this);
+    Utils.commonUtil.getDicAllDataList(this.PageConfig.dictionary, this);
+  }
+}
+export default Page;

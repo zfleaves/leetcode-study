@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>跳跃游戏</title>
+    <link rel="stylesheet" href="../common.css" as="style" />
+  </head>
+  <body>
+    <div class="elfjS" data-track-load="description_content">
+      <p>
+        给你一个非负整数数组&nbsp;<code>nums</code> ，你最初位于数组的
+        <strong>第一个下标</strong>
+        。数组中的每个元素代表你在该位置可以跳跃的最大长度。
+      </p>
+
+      <p>
+        判断你是否能够到达最后一个下标，如果可以，返回
+        <code>true</code> ；否则，返回 <code>false</code> 。
+      </p>
+
+      <p>&nbsp;</p>
+
+      <p><strong>示例&nbsp;1：</strong></p>
+
+      <pre><strong>输入：</strong>nums = [2,3,1,1,4]
+        <strong>输出：</strong>true
+        <strong>解释：</strong>可以先跳 1 步，从下标 0 到达下标 1, 然后再从下标 1 跳 3 步到达最后一个下标。
+        </pre>
+
+      <p><strong>示例&nbsp;2：</strong></p>
+
+      <pre><strong>输入：</strong>nums = [3,2,1,0,4]
+        <strong>输出：</strong>false
+        <strong>解释：</strong>无论怎样，总会到达下标为 3 的位置。但该下标的最大跳跃长度是 0 ， 所以永远不可能到达最后一个下标。
+        </pre>
+
+      <p>&nbsp;</p>
+
+      <p><strong>提示：</strong></p>
+
+      <ul>
+        <li>
+          <code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code>
+        </li>
+        <li>
+          <code>0 &lt;= nums[i] &lt;= 10<sup>5</sup></code>
+        </li>
+      </ul>
+    </div>
+    <div class="analysis">
+      <h5 id="方法1动态规划">方法1.动态规划</h5>
+      <ul>
+        <li>
+          思路：<code>dp[i]</code>表示能否到达位置i，对每个位置i判断能否通过前面的位置跳跃过来，当前位置j能达到，并且当前位置j加上能到达的位置如果超过了i，那<code>dp[i]</code>更新为ture，便是i位置也可以到达。
+        </li>
+        <li>
+          复杂度：时间复杂度<code>O(n^2)</code>，空间复杂度<code>O(n)</code>
+        </li>
+      </ul>
+      <h5 id="方法2贪心">方法2.贪心</h5>
+      <p>
+        <img
+          src="https://pic.leetcode-cn.com/1637635577-wUEOpJ-20211118145801.png"
+          alt="ds_147"
+        />
+      </p>
+      <ul>
+        <li>
+          思路：不用考虑每一步跳跃到那个位置，而是尽可能的跳跃到最远的位置，看最多能覆盖的位置，不断更新能覆盖的距离。
+        </li>
+        <li>
+          复杂度：时间复杂度<code>O(n)</code>，遍历一边。空间复杂度<code
+            >O(1)</code
+          >
+        </li>
+      </ul>
+    </div>
+    <script>
+      /**
+       * @param {number[]} nums
+       * @return {number}
+       */
+      function canJump(nums) {
+        let dp = new Array(nums.length).fill(false); //初始化dp
+        dp[0] = true; //第一项能到达
+        for (let i = 1; i < nums.length; i++) {
+          for (let j = 0; j < i; j++) {
+            //当前位置j能达到，并且当前位置j加上能到达的位置如果超过了i，那dp[i]更新为ture，便是i位置也可以到达
+            if (dp[j] && nums[j] + j >= i) {
+              dp[i] = true;
+              break;
+            }
+          }
+        }
+
+        return dp[nums.length - 1];
+      }
+      const nums = [2, 2, 1, 2, 0, 0];
+      const result = canJump(nums);
+      console.log("result: ", result);
+    </script>
+  </body>
+</html>

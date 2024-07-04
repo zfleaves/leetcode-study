@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2024-05-21 19:00:51
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-29 14:12:47
+ * @FilePath: \leetcode-study\面试经典150\index-3.html
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -69,7 +75,7 @@
                 }
                 while(rk + 1 < n && !occ.has(s.charAt(rk + 1))) {
                     occ.add(s.charAt(rk + 1))
-                    ++rk
+                    rk++
                 }
                 ans = Math.max(ans, rk - i + 1)
             }

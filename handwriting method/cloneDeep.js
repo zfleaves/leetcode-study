@@ -1,3 +1,9 @@
+/*
+ * @Date: 2024-05-21 19:00:51
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-25 12:02:14
+ * @FilePath: \leetcode-study\handwriting method\cloneDeep.js
+ */
 // 循环递归 深度克隆
 function cloneDeep(obj, hash = new WeakMap()) {
   if (obj === null) return obj;

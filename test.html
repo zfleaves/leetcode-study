@@ -1,30 +1,75 @@
+<!--
+ * @Date: 2024-05-18 22:03:00
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-20 20:58:24
+ * @FilePath: \leetcode-study\test.html
+-->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <script>
-      var removeElement = function (nums, val) {
-        let left = 0,
-          right = nums.length;
-        while (left < right) {
-          if (nums[left] === val) {
-            nums[left] = nums[right - 1];
-            right--;
-          } else {
-            left++;
-          }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 1. 消息中心（EventCenter）
+    // 消息中心（EventCenter）将负责管理事件，包括注册订阅者（subscribers）和触发事件（publish events）。
+    class EventCenter {
+      constructor() {
+        this.subscribers = []
+      }
+      // 订阅事件
+      subscribe(event, callback) {
+        if (!this.subscribers[event]) {
+          this.subscribers[event] = []
         }
-        console.log('nums: ', nums);
-        return left;
-      };
-      const nums = [3, 2, 2, 3];
-      const val = 3;
-      const result = removeElement(nums, val);
-      console.log("result: ", result);
-    </script>
-  </body>
+        this.subscribers[event].push(callback)
+      }
+      // 取消订阅
+      unsubscribe(event, callback) {
+        if (this.subscribers[event]) {
+          this.subscribers[event] = this.subscribers[event].filter(v => v !== callback)
+        }
+      }
+      // 发布事件
+      publish(event, ...args) {
+        if (this.subscribers[event]) {
+          this.subscribers[event].forEach(callback => {
+            callback(...args)
+          });
+        }
+      }
+    }
+    // 创建消息中心实例  
+    const eventCenter = new EventCenter();
+
+    // 2. 订阅者（Subscribers）
+    // 订阅者可以是任何对象或函数，它们将回调函数注册到消息中心以响应特定事件
+    // 订阅者（用户）
+    const user1 = {
+      receiveNews: function (news) {
+        console.log("用户1收到新闻:", news);
+      },
+    };
+
+    const user2 = {
+      receiveNews: function (news) {
+        console.log("用户2收到新闻:", news);
+      },
+    };
+    // 订阅科技新闻
+    eventCenter.subscribe("tech", user1.receiveNews);
+    eventCenter.subscribe("tech", user2.receiveNews);
+
+    // 订阅娱乐新闻
+    eventCenter.subscribe("entertainment", user1.receiveNews);
+
+    // 发布科技新闻
+    eventCenter.publish("tech", "最新的科技进展");
+  </script>
+</body>
+
 </html>

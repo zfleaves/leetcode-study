@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>删除有序数组中的重复项</title>
+  <link rel="stylesheet" href="../common.css" />
+  <style>
+    span.katex-mathml {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="elfjS" data-track-load="description_content">
+    <p>
+      给你一个 <strong>非严格递增排列</strong> 的数组
+      <code>nums</code> ，请你<strong><a href="http://baike.baidu.com/item/%E5%8E%9F%E5%9C%B0%E7%AE%97%E6%B3%95"
+          target="_blank">
+          原地</a></strong>
+      删除重复出现的元素，使每个元素
+      <strong>只出现一次</strong> ，返回删除后数组的新长度。元素的
+      <strong>相对顺序</strong> 应该保持 <strong>一致</strong> 。然后返回
+      <code>nums</code> 中唯一元素的个数。
+    </p>
+
+    <p>
+      考虑 <code>nums</code> 的唯一元素的数量为
+      <code>k</code> ，你需要做以下事情确保你的题解可以被通过：
+    </p>
+
+    <ul>
+      <li>
+        更改数组 <code>nums</code> ，使 <code>nums</code> 的前
+        <code>k</code> 个元素包含唯一元素，并按照它们最初在
+        <code>nums</code>
+        中出现的顺序排列。<code>nums</code>&nbsp;的其余元素与
+        <code>nums</code> 的大小不重要。
+      </li>
+      <li>返回 <code>k</code>&nbsp;。</li>
+    </ul>
+
+    <p><strong>判题标准:</strong></p>
+
+    <p>系统会用下面的代码来测试你的题解:</p>
+
+    <pre>
+        int[] nums = [...]; // 输入数组
+        int[] expectedNums = [...]; // 长度正确的期望答案
+        
+        int k = removeDuplicates(nums); // 调用
+        
+        assert k == expectedNums.length;
+        for (int i = 0; i &lt; k; i++) {
+            assert nums[i] == expectedNums[i];
+        }</pre>
+
+    <p>如果所有断言都通过，那么您的题解将被 <strong>通过</strong>。</p>
+
+    <p>&nbsp;</p>
+
+    <p><strong class="example">示例 1：</strong></p>
+
+    <pre><strong>输入：</strong>nums = [1,1,2]
+        <strong>输出：</strong>2, nums = [1,2,_]
+        <strong>解释：</strong>函数应该返回新的长度 <strong><code>2</code></strong> ，并且原数组 <em>nums </em>的前两个元素被修改为 <strong><code>1</code></strong>, <strong><code>2 </code></strong><code>。</code>不需要考虑数组中超出新长度后面的元素。
+        </pre>
+
+    <p><strong class="example">示例 2：</strong></p>
+
+    <pre><strong>输入：</strong>nums = [0,0,1,1,1,2,2,3,3,4]
+        <strong>输出：</strong>5, nums = [0,1,2,3,4]
+        <strong>解释：</strong>函数应该返回新的长度 <strong><code>5</code></strong> ， 并且原数组 <em>nums </em>的前五个元素被修改为 <strong><code>0</code></strong>, <strong><code>1</code></strong>, <strong><code>2</code></strong>, <strong><code>3</code></strong>, <strong><code>4</code></strong> 。不需要考虑数组中超出新长度后面的元素。
+        </pre>
+
+    <p>&nbsp;</p>
+
+    <p><strong>提示：</strong></p>
+
+    <ul>
+      <li>
+        <code>1 &lt;= nums.length &lt;= 3 * 10<sup>4</sup></code>
+      </li>
+      <li>
+        <code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code>
+      </li>
+      <li><code>nums</code> 已按 <strong>非严格递增</strong>&nbsp;排列</li>
+    </ul>
+  </div>
+  <div class="analysis">
+    <p>
+      由于给定的数组
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums\textit{nums}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.4306em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span></span></span></span></span>
+      是有序的，因此对于任意
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">i&lt;ji&lt;j</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6986em; vertical-align: -0.0391em"></span><span class="mord mathnormal">i</span><span
+                class="mspace" style="margin-right: 0.2778em"></span><span class="mrel">&lt;</span><span class="mspace"
+                style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 0.854em; vertical-align: -0.1944em"></span><span class="mord mathnormal"
+                style="margin-right: 0.05724em">j</span></span></span></span></span>，如果
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[i]=nums[j]\textit{nums}[i]=\textit{nums}[j]</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span
+                class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace"
+                style="margin-right: 0.2778em"></span><span class="mrel">=</span><span class="mspace"
+                style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord mathnormal"
+                style="margin-right: 0.05724em">j</span><span class="mclose">]</span></span></span></span></span>，则对任意
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">i≤k≤ji \le k \le j</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.7955em; vertical-align: -0.136em"></span><span class="mord mathnormal">i</span><span
+                class="mspace" style="margin-right: 0.2778em"></span><span class="mrel">≤</span><span class="mspace"
+                style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 0.8304em; vertical-align: -0.136em"></span><span class="mord mathnormal"
+                style="margin-right: 0.03148em">k</span><span class="mspace" style="margin-right: 0.2778em"></span><span
+                class="mrel">≤</span><span class="mspace" style="margin-right: 0.2778em"></span></span><span
+              class="base"><span class="strut" style="height: 0.854em; vertical-align: -0.1944em"></span><span
+                class="mord mathnormal" style="margin-right: 0.05724em">j</span></span></span></span></span>，必有
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[i]=nums[k]=nums[j]\textit{nums}[i]=\textit{nums}[k]=\textit{nums}[j]</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span
+                class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace"
+                style="margin-right: 0.2778em"></span><span class="mrel">=</span><span class="mspace"
+                style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord mathnormal"
+                style="margin-right: 0.03148em">k</span><span class="mclose">]</span><span class="mspace"
+                style="margin-right: 0.2778em"></span><span class="mrel">=</span><span class="mspace"
+                style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord mathnormal"
+                style="margin-right: 0.05724em">j</span><span
+                class="mclose">]</span></span></span></span></span>，即相等的元素在数组中的下标一定是连续的。利用数组有序的特点，可以通过双指针的方法删除重复元素。
+    </p>
+    <p>
+      如果数组
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums\textit{nums}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.4306em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span></span></span></span></span>
+      的长度为
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">00</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">0</span></span></span></span></span>，则数组不包含任何元素，因此返回
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">00</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">0</span></span></span></span></span>。
+    </p>
+    <p>
+      当数组
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums\textit{nums}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.4306em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span></span></span></span></span>
+      的长度大于
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">00</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">0</span></span></span></span></span>
+      时，数组中至少包含一个元素，在删除重复元素之后也至少剩下一个元素，因此
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums[0]\textit{nums}[0]</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord">0</span><span
+                class="mclose">]</span></span></span></span></span>
+      保持原状即可，从下标
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">1</span></span></span></span></span>
+      开始删除重复元素。
+    </p>
+    <p>
+      这道题目的要求是：对给定的有序数组
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums\textit{nums}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.4306em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span></span></span></span></span>
+      删除重复元素，在删除重复元素之后，每个元素只出现一次，并返回新的长度，上述操作必须通过原地修改数组的方法，使用
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">O(1)O(1)</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord mathnormal"
+                style="margin-right: 0.02778em">O</span><span class="mopen">(</span><span class="mord">1</span><span
+                class="mclose">)</span></span></span></span></span>
+      的空间复杂度完成。
+    </p>
+    <p>
+      定义两个指针
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">fast\textit{fast}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">fast</span></span></span></span></span></span>
+      和
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">slow\textit{slow}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">slow</span></span></span></span></span></span>
+      分别为快指针和慢指针，快指针表示遍历数组到达的下标位置，慢指针表示下一个不同元素要填入的下标位置，初始时两个指针都指向下标
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">1</span></span></span></span></span>。
+    </p>
+    <p>
+      假设数组
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums\textit{nums}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.4306em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span></span></span></span></span>
+      的长度为
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nn</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em"></span><span
+                class="mord mathnormal">n</span></span></span></span></span>。将快指针
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">fast\textit{fast}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">fast</span></span></span></span></span></span>
+      依次遍历从
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">1</span></span></span></span></span>
+      到
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">n−1n-1</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6667em; vertical-align: -0.0833em"></span><span class="mord mathnormal">n</span><span
+                class="mspace" style="margin-right: 0.2222em"></span><span class="mbin">−</span><span class="mspace"
+                style="margin-right: 0.2222em"></span></span><span class="base"><span class="strut"
+                style="height: 0.6444em"></span><span class="mord">1</span></span></span></span></span>
+      的每个位置，对于每个位置，如果
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[fast]≠nums[fast−1]\textit{nums}[\textit{fast}] \ne
+            \textit{nums}[\textit{fast}-1]</span><span class="katex-html" aria-hidden="true"><span class="base"><span
+                class="strut" style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">fast</span></span><span class="mclose">]</span><span class="mspace"
+                style="margin-right: 0.2778em"></span><span class="mrel"><span class="mrel"><span
+                    class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut"
+                          style="height: 0.8889em; vertical-align: -0.1944em"></span><span class="inner"><span
+                            class="mord"><span class="mrel"></span></span></span><span
+                          class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span
+                class="mspace" style="margin-right: 0.2778em"></span></span><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">fast</span></span><span class="mspace" style="margin-right: 0.2222em"></span><span
+                class="mbin">−</span><span class="mspace" style="margin-right: 0.2222em"></span></span><span
+              class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em"></span><span
+                class="mord">1</span><span class="mclose">]</span></span></span></span></span>，说明
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[fast]\textit{nums}[\textit{fast}]</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">fast</span></span><span class="mclose">]</span></span></span></span></span>
+      和之前的元素都不同，因此将
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[fast]\textit{nums}[\textit{fast}]</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">fast</span></span><span class="mclose">]</span></span></span></span></span>
+      的值复制到
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[slow]\textit{nums}[\textit{slow}]</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">slow</span></span><span class="mclose">]</span></span></span></span></span>，然后将
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">slow\textit{slow}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">slow</span></span></span></span></span></span>
+      的值加
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">11</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6444em"></span><span
+                class="mord">1</span></span></span></span></span>，即指向下一个位置。
+    </p>
+    <p>
+      遍历结束之后，从
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">nums[0]\textit{nums}[0]</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord">0</span><span
+                class="mclose">]</span></span></span></span></span>
+      到
+      <span class="math math-inline"><span class="katex"><span
+            class="katex-mathml">nums[slow−1]\textit{nums}[\textit{slow}-1]</span><span class="katex-html"
+            aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 1em; vertical-align: -0.25em"></span><span class="mord text"><span
+                  class="mord textit">nums</span></span><span class="mopen">[</span><span class="mord text"><span
+                  class="mord textit">slow</span></span><span class="mspace" style="margin-right: 0.2222em"></span><span
+                class="mbin">−</span><span class="mspace" style="margin-right: 0.2222em"></span></span><span
+              class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em"></span><span
+                class="mord">1</span><span class="mclose">]</span></span></span></span></span>
+      的每个元素都不相同且包含原数组中的每个不同的元素，因此新的长度即为
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">slow\textit{slow}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">slow</span></span></span></span></span></span>，返回
+      <span class="math math-inline"><span class="katex"><span class="katex-mathml">slow\textit{slow}</span><span
+            class="katex-html" aria-hidden="true"><span class="base"><span class="strut"
+                style="height: 0.6944em"></span><span class="mord text"><span
+                  class="mord textit">slow</span></span></span></span></span></span>
+      即可。
+    </p>
+  </div>
+  <script>
+    /**
+     * @param {number[]} nums
+     * @return {number}
+     */
+    var removeDuplicates = function (nums) {
+      const n = nums.length;
+      if (n === 0) return 0;
+      let left = 1;
+      let right = 1;
+      while (left < n) {
+        if (nums[left] !== nums[left - 1]) {
+          nums[right] = nums[left];
+          right++;
+        }
+        left++;
+      }
+      console.log("nums: ", nums);
+      return right;
+    };
+    const nums1 = [1, 1, 2];
+    const nums2 = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+    const result = removeDuplicates(nums2);
+    console.log("result: ", result);
+  </script>
+</body>
+
+</html>

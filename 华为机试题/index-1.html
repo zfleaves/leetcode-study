@@ -1,3 +1,15 @@
+<!--
+ * @Date: 2024-05-31 21:30:57
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-02 22:58:31
+ * @FilePath: \leetcode-study\华为机试题\index-1.html
+-->
+<!--
+ * @Date: 2024-05-31 21:30:57
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-02 19:38:57
+ * @FilePath: \leetcode-study\华为机试题\index-1.html
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,7 +26,8 @@
 </head>
 
 <body>
-    <div class="elfjS" data-track-load="description_content"><p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
+    <div class="elfjS" data-track-load="description_content">
+        <p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
 
         在学校中，N个小朋友站成一队， 第i个小朋友的身高为height[i]，
         第i个小朋友可以看到的第一个比自己身高更高的小朋友j，那么j是i的好朋友(要求j>i)。
@@ -38,28 +51,66 @@
          * @param {string[]} strs
          * @return {string}
          */
-         function findFriends(heights) {  
-            const n = heights.length;  
+        function findFriends(heights) {
+            const n = heights.length;
             const friends = new Array(n).fill(0); // 初始化一个长度为n的数组，全部填充为0  
             const stack = []; // 单调递减栈，存储小朋友的索引  
-        
-            for (let i = 0; i < n; i++) {  
+
+            for (let i = 0; i < n; i++) {
                 // 当栈不为空且当前小朋友的身高高于栈顶小朋友时  
-                while (stack.length > 0 && heights[i] > heights[stack[stack.length - 1]]) {  
+                while (stack.length > 0 && heights[i] > heights[stack[stack.length - 1]]) {
                     // 栈顶小朋友找到了他的好朋友  
-                    const j = stack.pop();  
+                    const j = stack.pop();
                     friends[j] = i + 1; // 注意索引从0开始，而题目要求从1开始，所以需要+1  
-                }  
+                }
                 stack.push(i); // 当前小朋友入栈  
-            }  
-        
-            return friends;  
-        }  
-        
+            }
+
+            return friends;
+        }
+
         // 示例用法  
         const heights = [1, 8, 6, 5, 2, 7]; // 示例身高数组  
-        const result = findFriends(heights);  
+        const result = findFriends(heights);
         console.log("result: ", result);
+    </script>
+    <script src="../华为OD/可以处理的最大任务数.js"></script>
+    <script>
+        const [w, h, startX, startY, sx, sy, t] = [12, 7, 2, 1, 1, -1, 13]
+
+        const matrix = [
+            '001000010000',
+            '001000010000',
+            '001000010000',
+            '001000010000',
+            '001000010000',
+            '001000010000',
+            '001000010000'
+        ].map(row => row.split('').map(Number))
+        console.log('matrix', matrix);
+
+        function fn(x, y, sx, sy, t) {
+            let ans = 0
+            while(t >= 0) {
+                if (matrix[y][x] === 1) {
+                    ans++
+                }
+                const x1 = x + sx
+                const y1 = y + sy
+                if (x1 < 0 || x1 > w - 1) {
+                    sx = -sx
+                }
+                if (y1 < 0 || y1 > h - 1) {
+                    sy = -sy
+                }
+                x += sx;  
+                y += sy;  
+                t--;  
+            }
+            return ans
+        }
+        const ans = fn(startX, startY, sx, sy, t)
+        console.log('%ans', ans);
     </script>
 </body>
 

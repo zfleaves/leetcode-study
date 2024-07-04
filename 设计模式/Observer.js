@@ -88,3 +88,33 @@ auctioneer.setPrice(50); // 触发通知，竞价者A和B可能会出价
 
 // 拍卖结束，可以设置一个很高的价格来结束拍卖
 auctioneer.setPrice(200); // 触发通知，但价格太高，无人再出价
+
+
+
+class Subject2 {
+  constructor() {
+    this.observers = []
+    this.currentPrice = 10
+  }
+
+  registerObserver(observer) {
+    this.observers.push(observer)
+  }
+
+  // 移除观察者
+  removeObserver(observer) {
+    this.observers = this.observers.filter((obs) => obs !== observer);
+  }
+
+  // 通知所有观察者
+  notifyObservers() {
+    this.observers.forEach((observer) => {
+      observer.update(this.currentPrice);
+    });
+  }
+
+  setPrice(price) {
+    this.currentPrice = price;
+    this.notifyObservers();
+  }
+}
