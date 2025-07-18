@@ -1,0 +1,299 @@
+<!--
+ * @Date: 2024-05-18 22:03:00
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2024-06-20 20:58:24
+ * @FilePath: \leetcode-study\test.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Intersection Observer 实现简单虚拟滚动</title>
+</head>
+
+<body>
+  <style>
+    /* 容器样式 - 必须设置固定高度和滚动 */
+    .container {
+      height: 400px;
+      width: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+    }
+
+    /* 占位元素撑开滚动高度 */
+    .scroll-placeholder {
+      position: relative;
+    }
+
+    /* 列表项样式 */
+    .item {
+      position: absolute;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.3s ease;
+      will-change: transform, opacity;
+    }
+  </style>
+  </head>
+
+  <body>
+    <div class="container" id="container">
+      <div class="scroll-placeholder"></div>
+    </div>
+
+    <!-- 关键实现要点：
+      ​容器设置：
+      固定高度容器需要设置 overflow-y: auto
+      使用绝对定位的占位元素维持滚动条正确比例
+      ​Intersection Observer 配置：
+      root: 指定滚动容器
+      rootMargin: 扩展100px的观察区域实现滚动缓冲
+      threshold: 0.1表示元素可见10%时触发
+      ​性能优化：
+      使用 transform 代替 top 定位（避免重排）
+      滚动事件使用 requestAnimationFrame 节流
+      维护已渲染项的索引集合避免重复操作
+      动态清理不可见的DOM节点
+      ​动态加载策略：
+      计算可见区域时包含缓冲项（VISIBLE_ITEMS）
+      根据滚动位置动态计算起止索引
+      进入视口的元素填充数据，离开视口的清空内容
+      ​注意事项：
+      需要预设每个item的高度
+      快速滚动时可能会有短暂空白（可添加加载状态）
+      大数据量时建议使用文档碎片批量操作DOM
+      这个实现方案相比传统滚动监听方式：
+
+      减少强制同步布局（layout thrashing）
+      更精确的可见性判断
+      更好的浏览器性能优化
+      可以进一步优化的方向：
+
+      添加滚动节流动画
+      实现动态高度支持
+      添加加载占位符
+      实现回收池复用DOM元素
+      支持横向滚动 -->
+
+    <!-- <script>
+      const CONTAINER = document.getElementById('container');
+      const ITEM_HEIGHT = 60;  // 每个列表项高度
+      const TOTAL_ITEMS = 1000; // 总数据量
+      const VISIBLE_ITEMS = Math.ceil(CONTAINER.clientHeight / ITEM_HEIGHT) + 2  // 缓冲数量
+
+      // 生成模拟数据
+      const data = Array.from({ length: TOTAL_ITEMS }, (_, i) => `Item ${i + 1}`)
+      let renderedItems = new Set() // 跟踪已渲染项
+
+      // 创建占位元素
+      const placeholder = document.querySelector('.scroll-placeholder')
+      placeholder.style.height = `${TOTAL_ITEMS * ITEM_HEIGHT}px`
+
+      // 创建观察器
+      const observer = new IntersectionObserver(handleIntersect, {
+        root: CONTAINER,
+        rootMargin: '100px 0px',
+        threshold: 0.1
+      })
+
+      // 初始化可视区域
+      updateVisibleItems()
+
+      function handleIntersect(entries) {
+        entries.forEach(entry => {
+          const index = parseInt(entry.target.dataset.index)
+          if (entry.isIntersecting) {
+            entry.target.innerHTML = data[index]  // 进入视口时填充内容
+          } else {
+            if (!renderedItems.has(index)) {
+              entry.target.innerHTML = ''  // 离开视口时清空内容
+            }
+          }
+        })
+      }
+
+      function updateVisibleItems() {
+        const scrollTop = CONTAINER.scrollTop
+        const startIndex = Math.floor(scrollTop / ITEM_HEIGHT)
+        const endIndex = startIndex + VISIBLE_ITEMS
+
+        // 创建/更新列表项
+        for (let i = startIndex; i <= endIndex; i++) {
+          if (i >= TOTAL_ITEMS) continue
+
+          let item = document.querySelector(`[data-index="${i}"]`)
+          if (!item) {
+            item = document.createElement('div')
+            item.className = 'item'
+            item.style.height = `${ITEM_HEIGHT}px`
+            item.style.transform = `translateY(${i * ITEM_HEIGHT}px)`
+            item.dataset.index = i
+            placeholder.appendChild(item)
+            observer.observe(item)
+          }
+        }
+
+        // 记录需要保留的项
+        const newRendered = new Set(
+          Array.from({ length: endIndex - startIndex + 1 }, (_, j) => startIndex + j)
+        )
+
+        // 清理不可见项
+        document.querySelectorAll('.item').forEach(item => {
+          const index = parseInt(item.dataset.index)
+          if (!newRendered.has(index) && renderedItems.has(index)) {
+            placeholder.removeChild(item)
+            observer.unobserve(item)
+          }
+        })
+
+        renderedItems = newRendered
+      }
+
+      // 滚动事件监听（使用节流）
+      let isThrottled = false
+      CONTAINER.addEventListener('scroll', () => {
+        if (!isThrottled) {
+          requestAnimationFrame(() => {
+            updateVisibleItems()
+            isThrottled = false
+          })
+          isThrottled = true
+        }
+      })
+    </script> -->
+    <script>
+      const CONTAINER = document.getElementById('container');
+      const ITEM_HEIGHT = 60;  // 每个列表项高度
+      const TOTAL_ITEMS = 1000; // 总数据量
+      const VISIBLE_ITEMS = Math.ceil(CONTAINER.clientHeight / ITEM_HEIGHT) + 2  // 缓冲数量
+      // 修改配置参数
+      const BUFFER_ROWS = 10  // 增加缓冲行数
+      const ROOT_MARGIN = '300px'  // 扩大观察区域
+      let lastScrollTime = 0
+      let lastScrollTop = 0
+
+      // 生成模拟数据
+      const data = Array.from({ length: TOTAL_ITEMS }, (_, i) => `Item ${i + 1}`)
+      let renderedItems = new Set() // 跟踪已渲染项
+
+      // 创建占位元素
+      const placeholder = document.querySelector('.scroll-placeholder')
+      placeholder.style.height = `${TOTAL_ITEMS * ITEM_HEIGHT}px`
+
+      // 修改观察器配置
+      const observer = new IntersectionObserver(handleIntersect, {
+        root: CONTAINER,
+        rootMargin: `${ROOT_MARGIN} 0px`,
+        threshold: 0.01
+      })
+      // 增加元素池
+      const itemPool = []
+
+      // 初始化可视区域
+      updateVisibleItems()
+      function getItemElement() {
+        return itemPool.pop() || document.createElement('div')
+      }
+
+      // 优化后的更新函数
+      function updateVisibleItems() {
+        const scrollTop = CONTAINER.scrollTop
+        const delta = scrollTop - lastScrollTop
+        const scrollSpeed = Math.abs(delta) / (Date.now() - lastScrollTime || 1)
+
+        // 动态调整缓冲量
+        const dynamicBuffer = Math.min(20, Math.max(BUFFER_ROWS, Math.floor(scrollSpeed / 50)))
+
+        const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - dynamicBuffer)
+        const endIndex = Math.min(
+          TOTAL_ITEMS - 1,
+          Math.ceil((scrollTop + CONTAINER.clientHeight) / ITEM_HEIGHT) + dynamicBuffer
+        )
+
+        // 预测滚动方向
+        const isScrollingDown = delta > 0
+        const predictiveBuffer = isScrollingDown ? dynamicBuffer * 2 : dynamicBuffer
+
+        // 创建/复用元素
+        const neededItems = endIndex - startIndex + 1
+        const currentItems = document.querySelectorAll('.item')
+
+        // 回收多余元素
+        currentItems.forEach(item => {
+          const index = parseInt(item.dataset.index)
+          if (index < startIndex || index > endIndex) {
+            placeholder.removeChild(item)
+            itemPool.push(item)
+            observer.unobserve(item)
+          }
+        })
+
+        // 批量更新元素
+        const fragment = document.createDocumentFragment()
+        for (let i = startIndex; i <= endIndex; i++) {
+          let item = document.querySelector(`[data-index="${i}"]`)
+          if (!item) {
+            item = getItemElement()
+            item.className = 'item'
+            item.style.height = `${ITEM_HEIGHT}px`
+            item.style.transform = `translateY(${i * ITEM_HEIGHT}px)`
+            item.dataset.index = i
+            fragment.appendChild(item)
+            observer.observe(item)
+
+            // 预加载相邻元素
+            if (i === endIndex && isScrollingDown) {
+              for (let j = 1; j <= predictiveBuffer; j++) {
+                const nextIndex = i + j
+                if (nextIndex >= TOTAL_ITEMS) break
+                const nextItem = getItemElement()
+                // ...类似创建逻辑...
+              }
+            }
+          }
+        }
+        placeholder.appendChild(fragment)
+
+        // 记录滚动状态
+        lastScrollTop = scrollTop
+        lastScrollTime = Date.now()
+      }
+
+      // 优化滚动监听（使用被动事件监听）
+      let rafId
+      CONTAINER.addEventListener('scroll', () => {
+        cancelAnimationFrame(rafId)
+        rafId = requestAnimationFrame(() => {
+          updateVisibleItems()
+          // 强制同步布局（慎用，仅在必要时）
+          if (Date.now() - lastScrollTime < 100) {
+            CONTAINER.scrollTop // 触发强制布局
+          }
+        })
+      }, { passive: true })
+
+      // 修改交叉观察回调
+      function handleIntersect(entries) {
+        entries.forEach(entry => {
+          const index = parseInt(entry.target.dataset.index)
+          if (entry.isIntersecting) {
+            entry.target.innerHTML = data[index]
+            entry.target.style.opacity = 1
+          } else {
+            // 保留内容但降低可见性
+            entry.target.style.opacity = 0.3
+          }
+        })
+      }
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,107 @@
+.compositePage {
+  width: 100%;
+  height: 100%;
+  background-color: #f2f4f7;
+  .roleCons {
+    height: 100%;
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    .contents {
+      width: 100%;
+      flex: auto;
+      display: flex;
+      .table1 {
+        // flex: 4;
+        margin-right: 10px;
+      }
+      // .table2 {
+      //   flex: 6;
+      // }
+      .contents-table{
+        height: 100%;
+        border: 1px solid #ebeef5;
+        background-color: #fff;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+        display: flex;
+        flex-direction: column;
+        .cons-top{
+          width: 100%;
+          .function_cons {
+            padding: 10px 10px 0 10px;
+            width: 100%;
+            box-sizing: border-box;
+            .search_cons{
+              padding: 10px;
+            }
+            .el-row {
+              width: 100%;
+              height: 100%;
+              margin: 0 0 !important;
+              .el-col {
+                height: 100%;
+                overflow: hidden;
+              }
+            }
+          }
+        }
+        .cons-bottom{
+          flex: auto;
+          width: 100%;
+          box-sizing: border-box;
+          padding: 5px 10px 10px 10px;
+          .cons {
+            height: 100%;
+            background-color: #fff;
+            // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+            position: relative;
+          .cons-table{
+              position: absolute;
+              width: 100%;
+              padding: 10px;
+              top: 0;
+              bottom: 0;
+              overflow-y: auto;
+              display: flex;
+              box-sizing: border-box;
+              flex-direction: column;
+              &::-webkit-scrollbar {
+                display: none;
+              }
+              .cons-head-btn{
+                text-align: right;
+                padding-bottom: 10px;
+                box-sizing: border-box;
+              }
+              .cons-table-t{
+                flex: auto;
+                // border: 1px solid #EBEEF5;
+                padding-top: 1px;
+              }
+              .pages {
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .cons-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 32px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .cons-table-expand{
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 30px;
+    padding: 0 10px;
+    div{
+      width: 33%;
+    }
+  }
+}

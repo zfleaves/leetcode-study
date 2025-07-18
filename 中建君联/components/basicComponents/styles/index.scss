@@ -1,0 +1,196 @@
+//引入样式文件
+//改写 element ui
+@import "./element-ui.scss";
+//按钮
+@import "./button.scss";
+//按钮颜色
+@import "./font.scss"; //字体颜色
+// 动画
+@import "./transition.scss"; //动画
+
+* {
+  margin: 0;
+  padding: 0;
+  // box-sizing: border-box;
+}
+
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: PingFangSC-Medium;
+  // font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+body .el-table colgroup.gutter {
+  display: table-cell !important;
+}
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+#app {
+  height: 100%;
+}
+
+//定位滚动样式
+.fixed-scroll {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.notice-popover {
+  padding: 0 !important;
+}
+
+// 省略
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lyoutWrap>.content {
+  width: 100%;
+  height: calc(100% - 60px) !important;
+}
+
+.menus {
+  .menusList {
+    .menuslll {
+      border-right: none !important;
+
+      .el-submenu__title {
+
+        i {
+          font-size: 16px;
+        }
+      }
+
+      .el-menu-item-group>ul {
+      }
+
+      .el-submenu .el-menu-item {
+        // background: rgb(43, 116, 237) !important;
+        // color: white !important;
+        line-height: 44px !important;
+      }
+    }
+  }
+}
+
+// 蓝色背景色
+// .menus {
+//   .menusList {
+//     .menuslll {
+//       background: #009F3A !important;
+//       border-right: none !important;
+//       .el-submenu__title {
+//         background: #009F3A !important;
+//         color: white !important;
+//         i {
+//           color: white !important;
+//         }
+//       }
+//       .el-menu-item-group>ul {
+//         background: #009F3A !important;
+//       }
+//       .el-submenu .el-menu-item {
+//         background: #009F3A !important;
+//         color: white !important;
+//         line-height: 44px !important;
+//         &.is-route-active {
+//           background: rgb(38, 102, 208) !important;
+//           i {
+//             color: white !important;
+//           }
+//           .is-span-close {
+//             color: white !important;
+//           }
+//           .is-span-active {
+//             color: white !important;
+//           }
+//         }
+//         i {
+//           color: white !important;
+//         }
+//         .is-span-close {
+//           color: white !important;
+//         }
+//       }
+//     }
+//   }
+// }
+/deep/ .el-menu {
+  width: 100%;
+  border-right: 0 !important;
+}
+
+.el-notification {
+  border-radius: 0;
+  padding: 0;
+}
+
+.IMNoticeItemsNotify {
+  /deep/ .el-notification__group {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /deep/ .el-notification__content {
+    margin: 0;
+  }
+}
+
+.custom-change {
+  display: flex;
+}
+
+.el-tooltip__popper {
+  max-width: 95% !important;
+}
+
+.hyperlink {
+  cursor: pointer;
+  font-size: 14px;
+  color: #009F3A;
+}
+
+
+.page-tips{
+  flex: 1;
+  margin-right: 20px;
+  border: 1px solid #009F3A;
+  background: rgba(3, 51, 222, 0.05);;
+  padding: 8px;
+  color: #555555;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  i{
+    color: rgba(3, 51, 222, 1);
+    margin-right: 10px;
+  }
+  span{
+    color: #ff4a4a;
+  }
+}
+.page-edit{
+  .page-tips{
+    margin-right: 0 !important;
+    margin-bottom: 10px !important;
+    font-size: 16px;
+  }
+}

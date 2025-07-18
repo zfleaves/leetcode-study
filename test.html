@@ -14,62 +14,167 @@
 </head>
 
 <body>
-  <script>
-    // 1. 消息中心（EventCenter）
-    // 消息中心（EventCenter）将负责管理事件，包括注册订阅者（subscribers）和触发事件（publish events）。
-    class EventCenter {
-      constructor() {
-        this.subscribers = []
-      }
-      // 订阅事件
-      subscribe(event, callback) {
-        if (!this.subscribers[event]) {
-          this.subscribers[event] = []
-        }
-        this.subscribers[event].push(callback)
-      }
-      // 取消订阅
-      unsubscribe(event, callback) {
-        if (this.subscribers[event]) {
-          this.subscribers[event] = this.subscribers[event].filter(v => v !== callback)
-        }
-      }
-      // 发布事件
-      publish(event, ...args) {
-        if (this.subscribers[event]) {
-          this.subscribers[event].forEach(callback => {
-            callback(...args)
-          });
-        }
-      }
+  <style>
+    .container {
+      display: flex;
+      width: 300px;
+      height: 200px;
+      background-color: lightblue;
     }
-    // 创建消息中心实例  
-    const eventCenter = new EventCenter();
 
-    // 2. 订阅者（Subscribers）
-    // 订阅者可以是任何对象或函数，它们将回调函数注册到消息中心以响应特定事件
-    // 订阅者（用户）
-    const user1 = {
-      receiveNews: function (news) {
-        console.log("用户1收到新闻:", news);
-      },
-    };
+    .item1 {
+      background-color: lightcoral;
+      flex: 1 0.2 0%;
+    }
 
-    const user2 = {
-      receiveNews: function (news) {
-        console.log("用户2收到新闻:", news);
-      },
-    };
-    // 订阅科技新闻
-    eventCenter.subscribe("tech", user1.receiveNews);
-    eventCenter.subscribe("tech", user2.receiveNews);
+    .item2 {
+      background-color: lightgreen;
+      flex: 1;
+    }
+  </style>
+  </head>
 
-    // 订阅娱乐新闻
-    eventCenter.subscribe("entertainment", user1.receiveNews);
+  <body>
+    <div class="container">
+      <div class="item1">item1</div>
+      <div class="item2">item2</div>
+    </div>
+    <script>
+      // 1. 消息中心（EventCenter）
+      // 消息中心（EventCenter）将负责管理事件，包括注册订阅者（subscribers）和触发事件（publish events）。
+      class EventCenter {
+        constructor() {
+          this.subscribers = []
+        }
+        // 订阅事件
+        subscribe(event, callback) {
+          if (!this.subscribers[event]) {
+            this.subscribers[event] = []
+          }
+          this.subscribers[event].push(callback)
+        }
+        // 取消订阅
+        unsubscribe(event, callback) {
+          if (this.subscribers[event]) {
+            this.subscribers[event] = this.subscribers[event].filter(v => v !== callback)
+          }
+        }
+        // 发布事件
+        publish(event, ...args) {
+          if (this.subscribers[event]) {
+            this.subscribers[event].forEach(callback => {
+              callback(...args)
+            });
+          }
+        }
+      }
+      // 创建消息中心实例  
+      const eventCenter = new EventCenter();
 
-    // 发布科技新闻
-    eventCenter.publish("tech", "最新的科技进展");
-  </script>
-</body>
+      // 2. 订阅者（Subscribers）
+      // 订阅者可以是任何对象或函数，它们将回调函数注册到消息中心以响应特定事件
+      // 订阅者（用户）
+      const user1 = {
+        receiveNews: function (news) {
+          console.log("用户1收到新闻:", news);
+        },
+      };
+
+      const user2 = {
+        receiveNews: function (news) {
+          console.log("用户2收到新闻:", news);
+        },
+      };
+      // 订阅科技新闻
+      eventCenter.subscribe("tech", user1.receiveNews);
+      eventCenter.subscribe("tech", user2.receiveNews);
+
+      // 订阅娱乐新闻
+      eventCenter.subscribe("entertainment", user1.receiveNews);
+
+      // 发布科技新闻
+      eventCenter.publish("entertainment", "最新的科技进展");
+
+
+      /**
+ * @param {string} homepage
+ */
+      var BrowserHistory = function (homepage) {
+        this.history = new Array(homepage);
+        this.current = 0;
+      };
+
+      /** 
+       * @param {string} url
+       * @return {void}
+       */
+      BrowserHistory.prototype.visit = function (url) {
+        // 检查当前页面位置是不是历史最后一位
+        if (this.history.length - 1 !== this.current) {
+          this.history = this.history.slice(0, this.current + 1);
+        }
+        this.history.push(url);
+        ++this.current;
+
+        console.log(this.history);
+      };
+
+      /** 
+       * @param {number} steps
+       * @return {string}
+       */
+      BrowserHistory.prototype.back = function (steps) {
+        let backIndex = this.current - steps;
+        this.current = backIndex < 0 ? 0 : backIndex;
+
+        console.log('this.history[this.current];: ', this.history[this.current]);
+        return this.history[this.current];
+      };
+
+      /** 
+       * @param {number} steps
+       * @return {string}
+       */
+      BrowserHistory.prototype.forward = function (steps) {
+        let forward = this.current + steps, end = this.history.length - 1;
+        this.current = forward > end ? end : forward;
+
+        console.log('this.history[this.current]: ', this.history[this.current]);
+        return this.history[this.current]
+      };
+
+      /** 
+       * Your BrowserHistory object will be instantiated and called as such:
+       * var obj = new BrowserHistory(homepage)
+       * obj.visit(url)
+       * var param_2 = obj.back(steps)
+       * var param_3 = obj.forward(steps)
+       */
+      const browserHistory = new BrowserHistory("leetcode.com");
+      browserHistory.visit("google.com");
+      browserHistory.visit("facebook.com"); 
+      browserHistory.visit("youtube.com"); 
+      browserHistory.back(1);    
+      browserHistory.back(1);   
+      browserHistory.forward(1);   
+      browserHistory.visit("linkedin.com"); 
+      browserHistory.forward(2);
+      browserHistory.back(2); 
+      browserHistory.back(7);  
+      
+      const user = {
+        name: "John",
+        count: 30,
+        getCount() {
+          console.log('this: ', this);
+          return this.count;
+        }
+      };
+      const func = user.getCount;
+      console.log(func()); // undefined
+      console.log(func.call(user)); // 30
+      console.log(func.apply(user)); // 30
+    </script>
+  </body>
 
 </html>

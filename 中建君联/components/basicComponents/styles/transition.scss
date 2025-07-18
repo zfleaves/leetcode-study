@@ -1,0 +1,115 @@
+/*动画*/
+
+//move
+.move-enter-active, .move-leave-active {
+  transition: all 0.3s linear;
+  transform: translate3d(0, 0, 0);
+}
+.move-enter, .move-leave-to {
+  transform: translate3d(100%, 0, 0);
+}
+.conmaterial-enter-active, .conmaterial-leave-active {
+  transition: all 0.3s linear;
+  transform: translate3d(0, 0, 0);
+  
+}
+.conmaterial-enter, .conmaterial-leave-to {
+  transform: translate3d(100%, 0, 0);
+}
+
+//
+//
+///*fade*/
+//.fade-enter-active,
+//.fade-leave-active {
+//  transition: opacity 0.28s;
+//}
+//
+//.fade-enter,
+//.fade-leave-active {
+//  opacity: 0;
+//}
+//
+///*fade*/
+//.breadcrumb-enter-active,
+//.breadcrumb-leave-active {
+//  transition: all .5s;
+//}
+//
+//.breadcrumb-enter,
+//.breadcrumb-leave-active {
+//  opacity: 0;
+//  transform: translateX(20px);
+//}
+//
+//.breadcrumb-move {
+//  transition: all .5s;
+//}
+//
+//.breadcrumb-leave-active {
+//  position: absolute;
+//}
+//
+//滑进滑出
+.slide-left-enter{
+  -webkit-transform: translate(100%, 0);
+  transform: translate(100%, 0);
+}
+.slide-left-leave-active {
+  -webkit-transform: translate(-100px, 0);
+  transform: translate(-100px, 0);
+}
+.slide-right-enter {
+  -webkit-transform: translate(-100%, 0);
+  transform: translate(-100%, 0);
+}
+.slide-right-leave-active {
+  -webkit-transform: translate(100%, 0);
+  transform: translate(100%, 0);
+}
+
+
+/*fade*/
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.28s;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
+
+/*fade-menuTransform*/
+.fade-menuTransform-leave-active,
+.fade-menuTransform-enter-active {
+  transition: all .5s;
+}
+.fade-menuTransform-enter {
+  opacity: 0;
+  transform: translateX(-200px);
+}
+.fade-menuTransform-leave-to {
+  opacity: 0;
+  transform: translateX(2400px);
+}
+
+/*breadcrumb transition*/
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+  transition: all .5s;
+}
+
+.breadcrumb-enter,
+.breadcrumb-leave-active {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.breadcrumb-move {
+  transition: all .5s;
+}
+
+.breadcrumb-leave-active {
+  position: absolute;
+}

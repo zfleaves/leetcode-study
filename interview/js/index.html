@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function bigNumberSum(a, b) {
+            // 123456789
+            // 000009876
+
+            // padding
+            let cur = 0;
+            while (cur < a.length || cur < b.length) {
+                if (!a[cur]) {
+                    a = "0" + a;
+                } else if (!b[cur]) {
+                    b = "0" + b;
+                }
+                cur++;
+            }
+
+            let carried = 0;
+            const res = [];
+
+            for (let i = a.length - 1; i > -1; i--) {
+                const sum = carried + +a[i] + +b[i];
+                if (sum > 9) {
+                    carried = 1;
+                } else {
+                    carried = 0;
+                }
+                res[i] = sum % 10;
+            }
+            if (carried === 1) {
+                res.unshift(1);
+            }
+
+            return res.join("");
+        }
+
+
+        const res = bigNumberSum('123456789', '9876')
+        console.log('res: ', res);
+
+        var longestCommonPrefix = function (strs) {
+            if (strs.length === 0) return ''
+            if (strs.length === 1) return strs[0]
+            let res = strs[0];
+            for (let i = 1; i < strs.length; i++) {
+                while (strs[i].indexOf(res) !== 0) {
+                    res = res.slice(0, -1); // 删除最后一位字符串
+                    if (res === '') return
+                }
+            }
+            return res;
+        };
+        const res1 = longestCommonPrefix(["dog", "racecar", "car"])
+        console.log('res1: ', res1);
+
+        var letterCombinations = function (digits) {
+            const len = digits.length
+            const map = ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+            if (!len) return []
+            if (len === 1) return map[digits].split("");
+            let res = []
+            let path = []
+            backtracking(digits, len, 0)
+            return res;
+
+            function backtracking(digits, len, i) {
+                if (path.length === len) {
+                    res.push(path.join(""));
+                    return
+                }
+                for (const v of map[digits[i]]) {
+                    path.push(v);
+                    backtracking(digits, len, i + 1);
+                    path.pop();
+                }
+            }
+        };
+        console.log(letterCombinations('23'))
+
+
+        /**
+         * @param {number[]} nums
+         * @param {number} target
+         * @return {number[][]}
+         */
+        function fourSum(nums, target, n = 4) {
+            nums.sort((a, b) => a - b); // 对数据进行排序
+            /*
+            注意：调用这个函数之前一定要先给 nums 排序
+            n 填写想求的是几数之和，start 从哪个索引开始计算（一般填 0），target 填想凑出的目标和
+            */
+            const nSumTarget = (nums, n, start, target) => {
+                let size = nums.length
+                let res = []
+                if (n < 2 || size < n) return res
+                if (n === 2) {
+                    // 双指针那一套操作
+                    let l = start
+                    let r = size - 1
+                    while (l < r) {
+                        let left = nums[l]
+                        let right = nums[r]
+                        let sum = left + right
+                        if (sum < target) {
+                            while (l < r && nums[l] === left) l++
+                        } else if (sum > target) {
+                            while (l < r && nums[r] === right) r--
+                        } else {
+                            res.push([left, right])
+                            while (l < r && nums[l] === left) l++
+                            while (l < r && nums[r] === right) r--
+                        }
+                    }
+                } else {
+                    // n > 2 时，递归计算 (n-1)Sum 的结果
+                    for (let i = start; i < size; i++) {
+                        let sub = nSumTarget(nums, n - 1, i + 1, target - nums[i]);
+                        // console.log('sub: ', sub);
+                        for (let arr of sub) {
+                            console.log('arr: ', arr);
+                            arr.push(nums[i])
+                            res.push(arr)
+                        }
+                        while (i < size - 1 && nums[i] === nums[i + 1]) i++
+                    }
+                }
+                return res
+            }
+            return nSumTarget(nums, n, 0, target)
+        }
+        const res2 = fourSum([1, 0, -1, 0, -2, 2], 0)
+        console.log('res2: ', res2);
+
+        /**
+         * @param {string} num
+         * @return {string}
+         */
+        var largestGoodInteger = function (num) {
+            if (num.length < 3) return '';
+            let res = '';
+            let max = '';
+            let slow = 0;
+            let fast = 1;
+            while (slow < num.length && fast < num.length) {
+                if (num[slow] !== num[fast]) {
+                    slow++;
+                    fast = slow + 1;
+                } else {
+                    res = num.slice(slow, fast + 1);
+                    if (res.length === 3) {
+                        if (Number(res) > Number(max) || max === '') {
+                            max = res;
+                        }
+                        fast++;
+                    } else if (res.length < 3) {
+                        fast++;
+                    } else {
+                        slow++;
+                        fast++;
+                    }
+                }
+            }
+            return max;
+        };
+        console.log(largestGoodInteger('230019'));
+
+        var findSubstring = function (s, words) {
+            const len = words.length;
+            if (!len || words.join('').length > s.length) return []
+            let res = permute(words);
+            let path = []
+            function permute(arr) {
+                if (arr.length <= 1) return [arr];
+                let result = [];
+                for (let i = 0; i < arr.length; i++) {
+                    let current = arr[i];
+                    let remaining = arr.slice(0, i).concat(arr.slice(i + 1));
+                    for (let p of permute(remaining)) {
+                        result.push([current].concat(p));
+                    }
+                }
+                return result.map(p => p.join(''));
+            }
+            console.log(res)
+            let list = []
+            for (let item of res) {
+                let index = s.indexOf(item)
+                if (index >= 0) {
+                    list.push(index)
+                }
+            }
+            console.log('list: ', list);
+            return [...new Set(list)]
+
+        };
+        const result5 = findSubstring('foobarfoobar', ["foo", "bar"])
+        console.log('result5: ', result5);
+    </script>
+</body>
+
+</html>

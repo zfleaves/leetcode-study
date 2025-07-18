@@ -2404,7 +2404,7 @@ function mergeDefaults(raw, defaults) {
     return props;
 }
 
-function initRender(vm) {
+function (vm) {
     vm._vnode = null; // the root of the child tree
     vm._staticTrees = null; // v-once cached trees
     const options = vm.$options;
