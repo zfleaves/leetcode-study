@@ -1,7 +1,7 @@
 <!--
  * @Date: 2024-05-18 22:03:00
  * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2024-06-20 20:58:24
+ * @LastEditTime: 2026-01-16 21:18:29
  * @FilePath: \leetcode-study\test.html
 -->
 <!DOCTYPE html>
@@ -97,8 +97,8 @@
 
 
       /**
- * @param {string} homepage
- */
+       * @param {string} homepage
+       */
       var BrowserHistory = function (homepage) {
         this.history = new Array(homepage);
         this.current = 0;
@@ -136,7 +136,8 @@
        * @return {string}
        */
       BrowserHistory.prototype.forward = function (steps) {
-        let forward = this.current + steps, end = this.history.length - 1;
+        let forward = this.current + steps,
+          end = this.history.length - 1;
         this.current = forward > end ? end : forward;
 
         console.log('this.history[this.current]: ', this.history[this.current]);
@@ -152,16 +153,16 @@
        */
       const browserHistory = new BrowserHistory("leetcode.com");
       browserHistory.visit("google.com");
-      browserHistory.visit("facebook.com"); 
-      browserHistory.visit("youtube.com"); 
-      browserHistory.back(1);    
-      browserHistory.back(1);   
-      browserHistory.forward(1);   
-      browserHistory.visit("linkedin.com"); 
+      browserHistory.visit("facebook.com");
+      browserHistory.visit("youtube.com");
+      browserHistory.back(1);
+      browserHistory.back(1);
+      browserHistory.forward(1);
+      browserHistory.visit("linkedin.com");
       browserHistory.forward(2);
-      browserHistory.back(2); 
-      browserHistory.back(7);  
-      
+      browserHistory.back(2);
+      browserHistory.back(7);
+
       const user = {
         name: "John",
         count: 30,
@@ -174,6 +175,79 @@
       console.log(func()); // undefined
       console.log(func.call(user)); // 30
       console.log(func.apply(user)); // 30
+    </script>
+    <script>
+      var longestConsecutive = function (nums) {
+        nums = [...new Set(nums)].sort((a, b) => a - b)
+        let res = 1;
+        let l = 0;
+        for (let i = 1; i < nums.lenght; i++) {
+          if (nums[i] - nums[i - 1] === 1) {
+            console.log(nums[i])
+            res = Math.max(res, i - l + 1)
+          } else {
+            l = i;
+          }
+        }
+        return res;
+      };
+      console.log(longestConsecutive([100, 4, 200, 1, 3, 2]));
+      /**
+       * @param {number[]} nums
+       * @param {number} target
+       * @return {number[][]}
+       */
+      /**
+       * @param {number[]} nums
+       * @param {number} target
+       * @return {number[][]}
+       */
+      function fourSum(nums, target, n = 3) {
+        nums.sort((a, b) => a - b); // 对数据进行排序
+        /*
+        注意：调用这个函数之前一定要先给 nums 排序
+        n 填写想求的是几数之和，start 从哪个索引开始计算（一般填 0），target 填想凑出的目标和
+        */
+        const nSumTarget = (nums, n, start, target) => {
+          let size = nums.length
+          let res = []
+          if (n < 2 || size < n) return res
+          if (n === 2) {
+            // 双指针那一套操作
+            let l = start
+            let r = size - 1
+            while (l < r) {
+              let left = nums[l]
+              let right = nums[r]
+              let sum = left + right
+              if (sum < target) {
+                while (l < r && nums[l] === left) l++
+              } else if (sum > target) {
+                while (l < r && nums[r] === right) r--
+              } else {
+                res.push([left, right])
+                while (l < r && nums[l] === left) l++
+                while (l < r && nums[r] === right) r--
+              }
+            }
+          } else {
+            // n > 2 时，递归计算 (n-1)Sum 的结果
+            for (let i = start; i < size; i++) {
+              let sub = nSumTarget(nums, n - 1, i + 1, target - nums[i]);
+              // console.log('sub: ', sub);
+              for (let arr of sub) {
+                console.log('arr: ', arr);
+                arr.push(nums[i])
+                res.push(arr)
+              }
+              while (i < size - 1 && nums[i] === nums[i + 1]) i++
+            }
+          }
+          return res
+        }
+        return nSumTarget(nums, n, 0, target)
+      }
+      console.log(fourSum([1,0,-1,0,-2,2], 0));
     </script>
   </body>
 

@@ -329,72 +329,84 @@ function warn$1(msg, ...args) {
 }
 
 let activeEffectScope;
+/**
+ * EffectScope - 副作用作用域类（Vue3 高级 API）
+ * 用于管理一组相关的副作用，可以批量停止
+ */
 class EffectScope {
   constructor(detached = false) {
-    this.detached = detached;
-    /**
-     * @internal
-     */
-    this._active = true;
-    /**
-     * @internal
-     */
-    this.effects = [];
-    /**
-     * @internal
-     */
-    this.cleanups = [];
-    this.parent = activeEffectScope;
+    this.detached = detached; // 是否分离（不从父作用域继承）
+    this._active = true; // 是否激活
+    this.effects = []; // 该作用域内的所有 effect
+    this.cleanups = []; // 该作用域内的所有清理函数
+    this.parent = activeEffectScope; // 父作用域
+    // 如果不是分离的且存在父作用域，将自己添加到父作用域
     if (!detached && activeEffectScope) {
       this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(
         this
       ) - 1;
     }
   }
+
   get active() {
     return this._active;
   }
+
+  /**
+   * run - 在该作用域内运行函数
+   * @param {Function} fn - 要运行的函数
+   * @returns {*} 返回函数的执行结果
+   */
   run(fn) {
     if (this._active) {
       const currentEffectScope = activeEffectScope;
       try {
-        activeEffectScope = this;
+        activeEffectScope = this; // 设置为当前作用域
         return fn();
       } finally {
-        activeEffectScope = currentEffectScope;
+        activeEffectScope = currentEffectScope; // 恢复之前的作用域
       }
     } else {
       warn$1(`cannot run an inactive effect scope.`);
     }
   }
+
   /**
-   * This should only be called on non-detached scopes
-   * @internal
+   * on - 激活该作用域（内部使用）
    */
   on() {
     activeEffectScope = this;
   }
+
   /**
-   * This should only be called on non-detached scopes
-   * @internal
+   * off - 停用该作用域（内部使用）
    */
   off() {
     activeEffectScope = this.parent;
   }
+
+  /**
+   * stop - 停止该作用域内的所有副作用
+   * @param {boolean} fromParent - 是否由父作用域调用
+   */
   stop(fromParent) {
     if (this._active) {
       let i, l;
+      // 停止所有 effect
       for (i = 0, l = this.effects.length; i < l; i++) {
         this.effects[i].stop();
       }
+      // 执行所有清理函数
       for (i = 0, l = this.cleanups.length; i < l; i++) {
         this.cleanups[i]();
       }
+      // 停止所有子作用域
       if (this.scopes) {
         for (i = 0, l = this.scopes.length; i < l; i++) {
           this.scopes[i].stop(true);
         }
       }
+      // 从父作用域中移除
       if (!this.detached && this.parent && !fromParent) {
         const last = this.parent.scopes.pop();
         if (last && last !== this) {
@@ -407,6 +419,35 @@ class EffectScope {
     }
   }
 }
+/**
+ * effectScope - 创建副作用作用域（Vue3 高级 API）
+ * @param {boolean} detached - 是否分离（不从父作用域继承）
+ * @returns {EffectScope} 返回一个 EffectScope 实例
+ *
+ * 作用：创建一个可以批量管理副作用的容器
+ *
+ * 实现原理：
+ * 1. 创建 EffectScope 实例
+ * 2. 如果不是分离的，自动添加到当前作用域
+ * 3. 提供方法来运行、停止作用域内的副作用
+ *
+ * 使用场景：
+ * - 批量管理一组相关的副作用
+ * - 组件卸载时清理所有副作用
+ * - 测试中清理副作用
+ * - 插件或库中管理副作用
+ *
+ * 示例：
+ * ```js
+ * const scope = effectScope()
+ * scope.run(() => {
+ *   const doubled = computed(() => count.value * 2)
+ *   watch(doubled, (val) => console.log(val))
+ * })
+ * // 停止所有副作用
+ * scope.stop()
+ * ```
+ */
 function effectScope(detached) {
   return new EffectScope(detached);
 }
@@ -418,6 +459,33 @@ function recordEffectScope(effect, scope = activeEffectScope) {
 function getCurrentScope() {
   return activeEffectScope;
 }
+/**
+ * onScopeDispose - 在当前作用域卸载时注册回调（Vue3 高级 API）
+ * @param {Function} fn - 要在作用域卸载时执行的回调函数
+ *
+ * 作用：在当前 effect scope 停止时执行清理逻辑
+ *
+ * 实现原理：
+ * 1. 检查是否存在激活的 effect scope
+ * 2. 将回调函数添加到当前作用域的 cleanups 数组
+ * 3. 当作用域停止时，自动执行所有清理函数
+ *
+ * 使用场景：
+ * - 在 effect scope 中注册清理逻辑
+ * - 类似 Vue 组件的 onUnmounted 生命周期
+ * - 清理定时器、事件监听器等
+ * - 在组合式函数中使用
+ *
+ * 示例：
+ * ```js
+ * const scope = effectScope()
+ * scope.run(() => {
+ *   const timer = setInterval(() => {}, 1000)
+ *   onScopeDispose(() => clearInterval(timer))
+ * })
+ * scope.stop() // 会自动执行 clearInterval
+ * ```
+ */
 function onScopeDispose(fn) {
   if (activeEffectScope) {
     activeEffectScope.cleanups.push(fn);
@@ -468,21 +536,31 @@ const maxMarkerBits = 30;
 let activeEffect;
 const ITERATE_KEY = Symbol("iterate" );
 const MAP_KEY_ITERATE_KEY = Symbol("Map key iterate" );
+/**
+ * ReactiveEffect - 响应式副作用类（Vue3 响应式系统的核心）
+ * 负责追踪依赖、触发更新、管理副作用
+ */
 class ReactiveEffect {
   constructor(fn, scheduler = null, scope) {
-    this.fn = fn;
-    this.scheduler = scheduler;
-    this.active = true;
-    this.deps = [];
-    this.parent = void 0;
-    recordEffectScope(this, scope);
+    this.fn = fn; // 副作用函数（如 watch 的回调、computed 的 getter）
+    this.scheduler = scheduler; // 调度器函数（用于批量更新，如 watchEffect）
+    this.active = true; // 是否激活
+    this.deps = []; // 依赖集合（该 effect 依赖的所有响应式数据）
+    this.parent = void 0; // 父 effect（用于嵌套 effect）
+    recordEffectScope(this, scope); // 记录到 effect scope
   }
+
+  /**
+   * run - 执行副作用函数
+   * 作用：在执行前收集依赖，执行后清理不再需要的依赖
+   */
   run() {
     if (!this.active) {
       return this.fn();
     }
     let parent = activeEffect;
     let lastShouldTrack = shouldTrack;
+    // 检查是否嵌套调用，避免循环
     while (parent) {
       if (parent === this) {
         return;
@@ -491,18 +569,18 @@ class ReactiveEffect {
     }
     try {
       this.parent = activeEffect;
-      activeEffect = this;
-      shouldTrack = true;
+      activeEffect = this; // 设置为当前激活的 effect
+      shouldTrack = true; // 开启依赖追踪
       trackOpBit = 1 << ++effectTrackDepth;
       if (effectTrackDepth <= maxMarkerBits) {
-        initDepMarkers(this);
+        initDepMarkers(this); // 初始化依赖标记
       } else {
-        cleanupEffect(this);
+        cleanupEffect(this); // 清理旧依赖
       }
-      return this.fn();
+      return this.fn(); // 执行副作用函数（会触发 getter，收集依赖）
     } finally {
       if (effectTrackDepth <= maxMarkerBits) {
-        finalizeDepMarkers(this);
+        finalizeDepMarkers(this); // 清理不再使用的依赖
       }
       trackOpBit = 1 << --effectTrackDepth;
       activeEffect = this.parent;
@@ -513,13 +591,18 @@ class ReactiveEffect {
       }
     }
   }
+
+  /**
+   * stop - 停止 effect
+   * 作用：从所有依赖中移除该 effect，停止响应式追踪
+   */
   stop() {
     if (activeEffect === this) {
       this.deferStop = true;
     } else if (this.active) {
-      cleanupEffect(this);
+      cleanupEffect(this); // 从所有依赖中移除
       if (this.onStop) {
-        this.onStop();
+        this.onStop(); // 执行停止回调
       }
       this.active = false;
     }
@@ -534,6 +617,27 @@ function cleanupEffect(effect2) {
     deps.length = 0;
   }
 }
+/**
+ * effect - 创建响应式副作用（Vue3 响应式 API）
+ * @param {Function} fn - 副作用函数
+ * @param {Object} options - 配置选项（lazy、scheduler、onTrack、onTrigger 等）
+ * @returns {Function} 返回一个可以手动执行或停止的 runner 函数
+ *
+ * 作用：立即执行传入的函数，并追踪其内部使用的响应式数据，当数据变化时自动重新执行
+ *
+ * 实现原理：
+ * 1. 创建 ReactiveEffect 实例，包装副作用函数
+ * 2. 如果不是 lazy 模式，立即执行一次（收集初始依赖）
+ * 3. 返回 runner 函数，可以手动调用执行或停止
+ * 4. 当依赖的响应式数据变化时，通过 scheduler 调度重新执行
+ *
+ * 使用场景：
+ * - 手动创建副作用（不推荐，推荐使用 watch 或 watchEffect）
+ * - 在某些特殊场景下需要精确控制副作用
+ * - 理解 Vue 响应式系统原理
+ *
+ * 注意：通常使用 watchEffect 代替此 API
+ */
 function effect(fn, options) {
   if (fn.effect instanceof ReactiveEffect) {
     fn = fn.effect.fn;
@@ -564,6 +668,31 @@ function resetTracking() {
   const last = trackStack.pop();
   shouldTrack = last === void 0 ? true : last;
 }
+/**
+ * track - 依赖收集（Vue3 响应式核心）
+ * @param {Object} target - 目标对象
+ * @param {string} type - 操作类型（get、has、iterate）
+ * @param {string|Symbol} key - 属性名
+ *
+ * 作用：当访问响应式对象的属性时，收集当前 effect 作为依赖
+ *
+ * 实现原理：
+ * 1. 检查是否需要追踪（shouldTrack）和是否有激活的 effect（activeEffect）
+ * 2. 在 targetMap 中查找或创建目标对象的依赖映射（Map）
+ * 3. 在 depsMap 中查找或创建该属性的依赖集合（Set）
+ * 4. 将当前 effect 添加到 dep 中，同时将 dep 添加到 effect.deps 中（双向绑定）
+ * 5. 调用 onTrack 钩子（开发环境调试用）
+ *
+ * 数据结构：
+ * - targetMap: WeakMap<target, Map<key, Set<effect>>>
+ *   - target: 响应式对象
+ *   - key: 属性名
+ *   - effect: 副作用函数
+ *
+ * 触发时机：
+ * - 访问响应式对象的属性时（getter）
+ * - 遍历响应式对象时（for...in、Object.keys 等）
+ */
 function track(target, type, key) {
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target);
@@ -603,6 +732,34 @@ function trackEffects(dep, debuggerEventExtraInfo) {
     }
   }
 }
+/**
+ * trigger - 触发更新（Vue3 响应式核心）
+ * @param {Object} target - 目标对象
+ * @param {string} type - 操作类型（set、add、delete、clear）
+ * @param {string|Symbol} key - 属性名
+ * @param {*} newValue - 新值
+ * @param {*} oldValue - 旧值
+ * @param {Object} oldTarget - 旧目标对象（用于 clear 操作）
+ *
+ * 作用：当响应式数据变化时，触发所有依赖该数据的 effect 重新执行
+ *
+ * 实现原理：
+ * 1. 从 targetMap 中获取目标对象的依赖映射
+ * 2. 根据操作类型和 key 找出所有需要触发的 effect
+ * 3. 特殊处理：
+ *    - clear: 触发所有属性
+ *    - 数组 length 变化: 触受影响的索引
+ *    - add/delete: 触发 ITERATE_KEY（遍历操作）
+ *    - Map 的 add/delete: 触发 MAP_KEY_ITERATE_KEY
+ * 4. 调用 triggerEffects 执行所有 effect
+ * 5. 优先执行 computed effect，再执行普通 effect
+ *
+ * 触发时机：
+ * - 修改响应式对象的属性时（setter）
+ * - 添加/删除属性时
+ * - 调用数组方法（push、pop、splice 等）时
+ * - 调用 Map/Set 方法（add、delete、clear）时
+ */
 function trigger(target, type, key, newValue, oldValue, oldTarget) {
   const depsMap = targetMap.get(target);
   if (!depsMap) {
@@ -733,13 +890,38 @@ function hasOwnProperty(key) {
   track(obj, "has", key);
   return obj.hasOwnProperty(key);
 }
+/**
+ * BaseReactiveHandler - 响应式处理器基类
+ * 负责处理所有响应式对象的读取操作（get 拦截）
+ * 被 MutableReactiveHandler 和 ReadonlyReactiveHandler 继承
+ */
 class BaseReactiveHandler {
   constructor(_isReadonly = false, _shallow = false) {
-    this._isReadonly = _isReadonly;
-    this._shallow = _shallow;
+    this._isReadonly = _isReadonly; // 是否只读
+    this._shallow = _shallow; // 是否浅层响应式
   }
+
+  /**
+   * get - 拦截属性读取操作
+   * @param {Object} target - 目标对象（原始对象）
+   * @param {string|Symbol} key - 属性名
+   * @param {Object} receiver - 代理对象
+   * @returns {*} 返回属性值
+   *
+   * 关键步骤：
+   * 1. 处理内部标记属性（__v_isReactive、__v_isReadonly、__v_isShallow、__v_raw）
+   * 2. 处理数组的特殊方法（includes、indexOf、lastIndexOf、push、pop 等）
+   * 3. 读取属性值
+   * 4. 跳过不需要追踪的属性（Symbol、__proto__、__v_isRef 等）
+   * 5. 收集依赖（非只读对象）
+   * 6. 浅层响应式直接返回
+   * 7. 数组索引的 ref 不解包，其他 ref 解包
+   * 8. 嵌套对象自动转为响应式/只读
+   */
   get(target, key, receiver) {
     const isReadonly2 = this._isReadonly, shallow = this._shallow;
+
+    // 步骤1: 处理内部标记属性
     if (key === "__v_isReactive") {
       return !isReadonly2;
     } else if (key === "__v_isReadonly") {
@@ -747,53 +929,96 @@ class BaseReactiveHandler {
     } else if (key === "__v_isShallow") {
       return shallow;
     } else if (key === "__v_raw") {
-      if (receiver === (isReadonly2 ? shallow ? shallowReadonlyMap : readonlyMap : shallow ? shallowReactiveMap : reactiveMap).get(target) || // receiver is not the reactive proxy, but has the same prototype
-      // this means the reciever is a user proxy of the reactive proxy
-      Object.getPrototypeOf(target) === Object.getPrototypeOf(receiver)) {
+      // 返回原始对象，需要验证 receiver 是否是正确的代理
+      if (receiver === (isReadonly2 ? shallow ? shallowReadonlyMap : readonlyMap : shallow ? shallowReactiveMap : reactiveMap).get(target) ||
+          Object.getPrototypeOf(target) === Object.getPrototypeOf(receiver)) {
         return target;
       }
       return;
     }
+
     const targetIsArray = isArray(target);
+
+    // 步骤2: 处理数组的特殊方法
     if (!isReadonly2) {
       if (targetIsArray && hasOwn(arrayInstrumentations, key)) {
+        // 使用数组增强方法（includes、indexOf 等会自动追踪依赖）
         return Reflect.get(arrayInstrumentations, key, receiver);
       }
       if (key === "hasOwnProperty") {
         return hasOwnProperty;
       }
     }
+
+    // 步骤3: 读取属性值
     const res = Reflect.get(target, key, receiver);
+
+    // 步骤4: 跳过不需要追踪的属性
     if (isSymbol(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
       return res;
     }
+
+    // 步骤5: 收集依赖（非只读对象）
     if (!isReadonly2) {
       track(target, "get", key);
     }
+
+    // 步骤6: 浅层响应式直接返回
     if (shallow) {
       return res;
     }
+
+    // 步骤7: 处理 ref 解包
+    // 数组索引的 ref 不解包（避免数组长度变化问题），其他 ref 解包
     if (isRef(res)) {
       return targetIsArray && isIntegerKey(key) ? res : res.value;
     }
+
+    // 步骤8: 嵌套对象自动转为响应式/只读
     if (isObject(res)) {
       return isReadonly2 ? readonly(res) : reactive(res);
     }
+
     return res;
   }
 }
+/**
+ * MutableReactiveHandler - 可变响应式处理器
+ * 继承自 BaseReactiveHandler，处理可变响应式对象的修改操作
+ * 用于 reactive() 和 shallowReactive() 创建的对象
+ */
 class MutableReactiveHandler extends BaseReactiveHandler {
   constructor(shallow = false) {
-    super(false, shallow);
+    super(false, shallow); // _isReadonly = false, 表示可变
   }
+
+  /**
+   * set - 拦截属性设置操作
+   * @param {Object} target - 目标对象
+   * @param {string|Symbol} key - 属性名
+   * @param {*} value - 新值
+   * @param {Object} receiver - 代理对象
+   * @returns {boolean} 是否设置成功
+   *
+   * 关键步骤：
+   * 1. 获取旧值
+   * 2. 处理 ref 赋值（如果旧值是 ref，新值不是 ref，直接修改 ref.value）
+   * 3. 判断是新增还是修改（通过 hadKey）
+   * 4. 执行设置操作
+   * 5. 触发更新（新增触发 "add"，修改触发 "set"）
+   */
   set(target, key, value, receiver) {
+    // 步骤1: 获取旧值
     let oldValue = target[key];
+
+    // 步骤2: 处理 ref 赋值（非浅层模式）
     if (!this._shallow) {
       const isOldValueReadonly = isReadonly(oldValue);
       if (!isShallow(value) && !isReadonly(value)) {
         oldValue = toRaw(oldValue);
         value = toRaw(value);
       }
+      // 如果旧值是 ref 且新值不是 ref，直接修改 ref.value
       if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
         if (isOldValueReadonly) {
           return false;
@@ -803,62 +1028,144 @@ class MutableReactiveHandler extends BaseReactiveHandler {
         }
       }
     }
+
+    // 步骤3: 判断是新增还是修改
     const hadKey = isArray(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn(target, key);
+
+    // 步骤4: 执行设置操作
     const result = Reflect.set(target, key, value, receiver);
+
+    // 步骤5: 触发更新（确保 receiver 是正确的代理）
     if (target === toRaw(receiver)) {
       if (!hadKey) {
+        // 新增属性
         trigger(target, "add", key, value);
       } else if (hasChanged(value, oldValue)) {
+        // 修改属性（值真正改变才触发）
         trigger(target, "set", key, value, oldValue);
       }
     }
+
     return result;
   }
+
+  /**
+   * deleteProperty - 拦截属性删除操作
+   * @param {Object} target - 目标对象
+   * @param {string|Symbol} key - 属性名
+   * @returns {boolean} 是否删除成功
+   *
+   * 关键步骤：
+   * 1. 检查属性是否存在
+   * 2. 获取旧值
+   * 3. 执行删除操作
+   * 4. 如果删除成功，触发 "delete" 更新
+   */
   deleteProperty(target, key) {
+    // 步骤1: 检查属性是否存在
     const hadKey = hasOwn(target, key);
+    // 步骤2: 获取旧值
     const oldValue = target[key];
+    // 步骤3: 执行删除操作
     const result = Reflect.deleteProperty(target, key);
+    // 步骤4: 触发更新
     if (result && hadKey) {
       trigger(target, "delete", key, void 0, oldValue);
     }
     return result;
   }
+
+  /**
+   * has - 拦截 in 操作符
+   * @param {Object} target - 目标对象
+   * @param {string|Symbol} key - 属性名
+   * @returns {boolean} 属性是否存在
+   *
+   * 关键步骤：
+   * 1. 检查属性是否存在
+   * 2. 收集依赖（跳过内置 Symbol）
+   */
   has(target, key) {
+    // 步骤1: 检查属性是否存在
     const result = Reflect.has(target, key);
+    // 步骤2: 收集依赖
     if (!isSymbol(key) || !builtInSymbols.has(key)) {
       track(target, "has", key);
     }
     return result;
   }
+
+  /**
+   * ownKeys - 拦截 Object.keys()、for...in 等操作
+   * @param {Object} target - 目标对象
+   * @returns {Array} 返回所有键
+   *
+   * 关键步骤：
+   * 1. 收集依赖（数组追踪 "length"，对象追踪 ITERATE_KEY）
+   * 2. 返回所有键
+   */
   ownKeys(target) {
+    // 步骤1: 收集依赖
     track(
       target,
       "iterate",
       isArray(target) ? "length" : ITERATE_KEY
     );
+    // 步骤2: 返回所有键
     return Reflect.ownKeys(target);
   }
 }
+/**
+ * ReadonlyReactiveHandler - 只读响应式处理器
+ * 继承自 BaseReactiveHandler，阻止所有修改操作
+ * 用于 readonly() 和 shallowReadonly() 创建的对象
+ */
 class ReadonlyReactiveHandler extends BaseReactiveHandler {
   constructor(shallow = false) {
-    super(true, shallow);
+    super(true, shallow); // _isReadonly = true, 表示只读
   }
+
+  /**
+   * set - 拦截属性设置操作（只读模式下阻止）
+   * @param {Object} target - 目标对象
+   * @param {string|Symbol} key - 属性名
+   * @returns {boolean} 返回 true（表示操作成功，但实际上不修改）
+   *
+   * 关键步骤：
+   * 1. 发出警告（开发环境）
+   * 2. 返回 true（不实际修改，但符合 Proxy 规范）
+   */
   set(target, key) {
+    // 步骤1: 发出警告（开发环境）
     {
       warn$1(
         `Set operation on key "${String(key)}" failed: target is readonly.`,
         target
       );
     }
+    // 步骤2: 返回 true（符合 Proxy 规范，但不实际修改）
     return true;
   }
+
+  /**
+   * deleteProperty - 拦截属性删除操作（只读模式下阻止）
+   * @param {Object} target - 目标对象
+   * @param {string|Symbol} key - 属性名
+   * @returns {boolean} 返回 true（表示操作成功，但实际上不删除）
+   *
+   * 关键步骤：
+   * 1. 发出警告（开发环境）
+   * 2. 返回 true（不实际删除，但符合 Proxy 规范）
+   */
   deleteProperty(target, key) {
+    // 步骤1: 发出警告（开发环境）
     {
       warn$1(
         `Delete operation on key "${String(key)}" failed: target is readonly.`,
         target
       );
     }
+    // 步骤2: 返回 true（符合 Proxy 规范，但不实际删除）
     return true;
   }
 }
@@ -1177,6 +1484,25 @@ function targetTypeMap(rawType) {
 function getTargetType(value) {
   return value["__v_skip"] || !Object.isExtensible(value) ? 0 /* INVALID */ : targetTypeMap(toRawType(value));
 }
+/**
+ * reactive - 创建响应式对象（Vue3 核心响应式 API）
+ * @param {Object|Array} target - 需要转换为响应式的目标对象或数组
+ * @returns {Proxy} 返回目标对象的响应式代理
+ *
+ * 作用：将普通对象转换为响应式对象，当对象的属性被读取或修改时，能够自动追踪依赖并触发更新
+ *
+ * 实现原理：
+ * 1. 检查目标是否已经是只读对象，如果是则直接返回
+ * 2. 调用 createReactiveObject 创建响应式代理
+ * 3. 使用 Proxy API 拦截对象的 get/set/has/deleteProperty 等操作
+ * 4. 通过 mutableHandlers 处理普通对象和数组的拦截逻辑
+ * 5. 通过 mutableCollectionHandlers 处理 Set、Map 等集合类型的特殊逻辑
+ * 6. 使用 reactiveMap 缓存已创建的代理，避免重复代理同一对象
+ *
+ * 使用场景：
+ * - 在 setup() 或 <script setup> 中定义响应式数据
+ * - 需要深层响应式的对象或数组
+ */
 function reactive(target) {
   if (isReadonly(target)) {
     return target;
@@ -1189,6 +1515,26 @@ function reactive(target) {
     reactiveMap
   );
 }
+/**
+ * shallowReactive - 创建浅层响应式对象（Vue3 响应式 API）
+ * @param {Object|Array} target - 需要转换为浅层响应式的目标对象或数组
+ * @returns {Proxy} 返回目标对象的浅层响应式代理
+ *
+ * 作用：创建一个只有顶层属性是响应式的对象，嵌套对象不会自动转为响应式
+ *
+ * 实现原理：
+ * 1. 调用 createReactiveObject 创建浅层响应式代理
+ * 2. 使用 shallowReactiveHandlers 拦截操作
+ * 3. 在 getter 中不自动将嵌套对象转为响应式（与 reactive 的区别）
+ * 4. 只有顶层属性的变化会触发更新
+ *
+ * 使用场景：
+ * - 性能优化：大型嵌套对象，只有顶层需要响应式
+ * - 避免深层响应式的性能开销
+ * - 需要精确控制响应式范围的场景
+ *
+ * 注意：与 reactive 的区别是嵌套对象不会自动转为响应式
+ */
 function shallowReactive(target) {
   return createReactiveObject(
     target,
@@ -1198,6 +1544,25 @@ function shallowReactive(target) {
     shallowReactiveMap
   );
 }
+/**
+ * readonly - 创建只读的响应式对象（Vue3 响应式 API）
+ * @param {Object|Array} target - 需要转换为只读的目标对象或数组
+ * @returns {Proxy} 返回目标对象的只读代理
+ *
+ * 作用：创建一个只读的响应式对象，所有修改操作都会被阻止并发出警告
+ *
+ * 实现原理：
+ * 1. 调用 createReactiveObject 创建只读代理
+ * 2. 使用 readonlyHandlers 拦截所有修改操作（set、deleteProperty）
+ * 3. 在修改操作中发出警告并返回 false
+ * 4. 读取操作正常进行，但返回的嵌套对象也会被转换为只读
+ *
+ * 使用场景：
+ * - 保护数据不被修改
+ * - 向子组件传递 props 时确保不被修改
+ * - 创建不可变的数据源
+ * - 防止意外修改状态
+ */
 function readonly(target) {
   return createReactiveObject(
     target,
@@ -1241,6 +1606,23 @@ function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandl
   proxyMap.set(target, proxy);
   return proxy;
 }
+/**
+ * isReactive - 检查一个对象是否是由 reactive 创建的响应式对象（Vue3 工具 API）
+ * @param {*} value - 要检查的值
+ * @returns {boolean} 如果是响应式对象返回 true
+ *
+ * 作用：判断一个对象是否是响应式对象
+ *
+ * 实现原理：
+ * 1. 检查对象是否有 __v_isReactive 标记
+ * 2. 如果是只读对象，检查其 __v_raw 是否是响应式
+ * 3. 返回检查结果
+ *
+ * 使用场景：
+ * - 条件判断：根据是否是响应式对象执行不同逻辑
+ * - 调试：检查对象是否已被转换为响应式
+ * - 类型守卫：在 TypeScript 中作为类型守卫使用
+ */
 function isReactive(value) {
   if (isReadonly(value)) {
     return isReactive(value["__v_raw"]);
@@ -1256,10 +1638,52 @@ function isShallow(value) {
 function isProxy(value) {
   return isReactive(value) || isReadonly(value);
 }
+/**
+ * toRaw - 获取响应式对象的原始对象（Vue3 工具 API）
+ * @param {Proxy} observed - 响应式对象
+ * @returns {Object} 返回原始对象
+ *
+ * 作用：获取响应式对象的原始非响应式版本
+ *
+ * 实现原理：
+ * 1. 检查对象是否有 __v_raw 属性（原始对象引用）
+ * 2. 如果有，递归调用 toRaw 直到获取到最原始的对象
+ * 3. 如果没有，直接返回对象本身
+ *
+ * 使用场景：
+ * - 性能优化：在某些场景下使用原始对象避免响应式开销
+ * - 比较对象：比较两个对象是否相等（响应式对象引用不同）
+ * - 与外部库交互：某些库不接受响应式对象
+ * - 调试：查看原始数据
+ */
 function toRaw(observed) {
   const raw = observed && observed["__v_raw"];
   return raw ? toRaw(raw) : observed;
 }
+/**
+ * markRaw - 标记一个对象，使其永远不会被转换为响应式（Vue3 工具 API）
+ * @param {*} value - 要标记的值
+ * @returns {*} 返回标记后的值
+ *
+ * 作用：标记一个对象，使其永远不会被 reactive 或 ref 转换为响应式
+ *
+ * 实现原理：
+ * 1. 使用 def 函数在对象上定义 __v_skip 属性为 true
+ * 2. 在 createReactiveObject 中检查此属性，如果存在则跳过转换
+ * 3. 返回标记后的对象
+ *
+ * 使用场景：
+ * - 性能优化：大型对象不需要响应式
+ * - 第三方库对象：某些库的对象不应该被代理
+ * - 静态配置：不变的数据
+ * - 避免代理开销：只读或很少变化的数据
+ *
+ * 示例：
+ * ```js
+ * const config = markRaw({ api: 'https://api.example.com' })
+ * const state = reactive({ config }) // config 不会被转为响应式
+ * ```
+ */
 function markRaw(value) {
   def(value, "__v_skip", true);
   return value;
@@ -1293,12 +1717,68 @@ function triggerRefValue(ref2, newVal) {
     }
   }
 }
+/**
+ * isRef - 检查一个值是否是 ref 对象（Vue3 工具 API）
+ * @param {*} r - 要检查的值
+ * @returns {boolean} 如果是 ref 返回 true
+ *
+ * 作用：判断一个值是否是 ref 对象
+ *
+ * 实现原理：
+ * 1. 检查对象是否有 __v_isRef 标记且值为 true
+ * 2. 返回检查结果
+ *
+ * 使用场景：
+ * - 条件判断：根据是否是 ref 执行不同逻辑
+ * - 调试：检查值是否是 ref
+ * - 类型守卫：在 TypeScript 中作为类型守卫使用
+ */
 function isRef(r) {
   return !!(r && r.__v_isRef === true);
 }
+/**
+ * ref - 创建响应式引用（Vue3 核心响应式 API）
+ * @param {*} value - 需要包装的任意值
+ * @returns {Ref} 返回一个包含 .value 属性的响应式对象
+ *
+ * 作用：将任意类型的值包装成响应式对象，通过 .value 属性访问和修改值
+ *
+ * 实现原理：
+ * 1. 调用 createRef 创建 RefImpl 实例
+ * 2. 如果传入的值已经是 ref，直接返回
+ * 3. 创建 RefImpl 对象，保存原始值（_rawValue）和转换后的值（_value）
+ * 4. 对于对象类型的值，使用 toReactive 转换为响应式对象
+ * 5. 在 get value() 中调用 trackRefValue 收集依赖
+ * 6. 在 set value() 中调用 triggerRefValue 触发更新
+ *
+ * 使用场景：
+ * - 包装基本类型（string、number、boolean）为响应式
+ * - 需要单独追踪某个值的响应式变化
+ * - 在模板中自动解包，无需 .value
+ */
 function ref(value) {
   return createRef(value, false);
 }
+/**
+ * shallowRef - 创建浅层响应式引用（Vue3 响应式 API）
+ * @param {*} value - 需要包装的任意值
+ * @returns {Ref} 返回一个浅层 ref
+ *
+ * 作用：创建一个 ref，但只有 .value 的赋值是响应式的，.value 内部的对象不会自动转为响应式
+ *
+ * 实现原理：
+ * 1. 调用 createRef，传入 shallow = true
+ * 2. 在 RefImpl 中，__v_isShallow 标记为 true
+ * 3. getter/setter 中不调用 toReactive/toRaw
+ * 4. 只有直接替换 .value 才会触发更新
+ *
+ * 使用场景：
+ * - 性能优化：大型对象，不需要深层响应式
+ * - 需要整体替换对象，而不是修改对象属性
+ * - 避免深层响应式的性能开销
+ *
+ * 注意：与 ref 的区别是 .value 内部的对象不会自动转为响应式
+ */
 function shallowRef(value) {
   return createRef(value, true);
 }
@@ -1308,21 +1788,36 @@ function createRef(rawValue, shallow) {
   }
   return new RefImpl(rawValue, shallow);
 }
+/**
+ * RefImpl - ref 的实现类
+ * 负责包装值并提供响应式能力
+ */
 class RefImpl {
   constructor(value, __v_isShallow) {
-    this.__v_isShallow = __v_isShallow;
-    this.dep = void 0;
-    this.__v_isRef = true;
-    this._rawValue = __v_isShallow ? value : toRaw(value);
-    this._value = __v_isShallow ? value : toReactive(value);
+    this.__v_isShallow = __v_isShallow; // 是否为浅层 ref
+    this.dep = void 0; // 依赖集合（存储所有使用该 ref 的 effect）
+    this.__v_isRef = true; // 标记这是一个 ref 对象
+    this._rawValue = __v_isShallow ? value : toRaw(value); // 保存原始值（用于比较）
+    this._value = __v_isShallow ? value : toReactive(value); // 保存响应式值
   }
+
+  /**
+   * getter - 当访问 .value 时触发
+   * 作用：收集依赖，将当前 effect 添加到 dep 中
+   */
   get value() {
     trackRefValue(this);
     return this._value;
   }
+
+  /**
+   * setter - 当设置 .value 时触发
+   * 作用：更新值并触发依赖更新
+   */
   set value(newVal) {
     const useDirectValue = this.__v_isShallow || isShallow(newVal) || isReadonly(newVal);
     newVal = useDirectValue ? newVal : toRaw(newVal);
+    // 只有值真正改变时才触发更新
     if (hasChanged(newVal, this._rawValue)) {
       this._rawValue = newVal;
       this._value = useDirectValue ? newVal : toReactive(newVal);
@@ -1333,6 +1828,31 @@ class RefImpl {
 function triggerRef(ref2) {
   triggerRefValue(ref2, ref2.value );
 }
+/**
+ * unref - 如果参数是 ref，则返回其内部值，否则返回参数本身（Vue3 工具 API）
+ * @param {*} ref - 要解包的值
+ * @returns {*} 返回解包后的值
+ *
+ * 作用：简化 ref 的访问，无需判断是否是 ref
+ *
+ * 实现原理：
+ * 1. 检查参数是否是 ref（使用 isRef）
+ * 2. 如果是 ref，返回 .value
+ * 3. 如果不是 ref，直接返回参数
+ *
+ * 使用场景：
+ * - 编写通用函数时，参数可能是 ref 也可能是普通值
+ * - 简化代码，避免到处写 isRef 判断
+ * - 在组合式函数中使用
+ *
+ * 示例：
+ * ```js
+ * function useValue(val) {
+ *   const value = unref(val) // val 可能是 ref 也可能是普通值
+ *   console.log(value)
+ * }
+ * ```
+ */
 function unref(ref2) {
   return isRef(ref2) ? ref2.value : ref2;
 }
@@ -1351,6 +1871,26 @@ const shallowUnwrapHandlers = {
     }
   }
 };
+/**
+ * proxyRefs - 解包对象中的所有 ref（Vue3 工具 API）
+ * @param {Object} objectWithRefs - 包含 ref 的对象
+ * @returns {Proxy} 返回一个代理，自动解包所有 ref
+ *
+ * 作用：创建一个代理，访问属性时自动解包 ref，设置属性时自动包装为 ref
+ *
+ * 实现原理：
+ * 1. 如果对象已经是响应式的，直接返回
+ * 2. 否则创建 Proxy，使用 shallowUnwrapHandlers
+ * 3. get: 如果属性是 ref，返回 .value，否则返回原值
+ * 4. set: 如果原属性是 ref 且新值不是 ref，设置 .value，否则直接赋值
+ *
+ * 使用场景：
+ * - 在 setup() 中返回包含 ref 的对象给模板
+ * - 在组合式函数中返回包含 ref 的对象
+ * - 简化模板中的 ref 访问（模板中自动解包）
+ *
+ * 注意：模板中会自动调用此函数，所以模板中可以直接使用 ref 而不需要 .value
+ */
 function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
 }
@@ -1372,9 +1912,72 @@ class CustomRefImpl {
     this._set(newVal);
   }
 }
+/**
+ * customRef - 创建自定义的 ref（Vue3 高级响应式 API）
+ * @param {Function} factory - 工厂函数，接收 track 和 trigger 函数
+ * @returns {CustomRefImpl} 返回一个自定义 ref
+ *
+ * 作用：创建一个可以自定义追踪和触发逻辑的 ref
+ *
+ * 实现原理：
+ * 1. 调用工厂函数，传入 track 和 trigger 函数
+ * 2. 工厂函数返回包含 get 和 set 的对象
+ * 3. 创建 CustomRefImpl 实例，使用自定义的 get 和 set
+ * 4. 用户可以在 get 中调用 track 收集依赖，在 set 中调用 trigger 触发更新
+ *
+ * 使用场景：
+ * - 需要精确控制依赖收集和更新触发
+ * - 实现防抖/节流的 ref
+ * - 实现异步验证的 ref
+ * - 实现特殊的响应式逻辑
+ *
+ * 示例：
+ * ```js
+ * function useDebouncedRef(value, delay = 200) {
+ *   let timeout
+ *   return customRef((track, trigger) => ({
+ *     get() {
+ *       track()
+ *       return value
+ *     },
+ *     set(newValue) {
+ *       value = newValue
+ *       clearTimeout(timeout)
+ *       timeout = setTimeout(trigger, delay)
+ *     }
+ *   }))
+ * }
+ * ```
+ */
 function customRef(factory) {
   return new CustomRefImpl(factory);
 }
+/**
+ * toRefs - 将响应式对象转换为普通对象，其中每个属性都是 ref（Vue3 响应式 API）
+ * @param {Object} object - 响应式对象
+ * @returns {Object} 返回一个普通对象，每个属性都是 ref
+ *
+ * 作用：解构响应式对象时保持响应式
+ *
+ * 实现原理：
+ * 1. 检查传入的对象是否是响应式对象
+ * 2. 遍历对象的所有属性
+ * 3. 为每个属性创建一个 ObjectRefImpl（指向原对象的属性）
+ * 4. 返回包含所有 ref 的普通对象
+ *
+ * 使用场景：
+ * - 在 setup() 中解构 props 时保持响应式
+ * - 将响应式对象传递给子组件时保持响应式
+ * - 在组合式函数中返回响应式对象时使用
+ *
+ * 示例：
+ * ```js
+ * const state = reactive({ count: 0, name: 'Vue' })
+ * const { count, name } = toRefs(state)
+ * // count 和 name 都是 ref，修改它们会触发更新
+ * count.value++
+ * ```
+ */
 function toRefs(object) {
   if (!isProxy(object)) {
     console.warn(`toRefs() expects a reactive object but received a plain one.`);
@@ -1413,6 +2016,33 @@ class GetterRefImpl {
     return this._getter();
   }
 }
+/**
+ * toRef - 将响应式对象的某个属性转换为 ref（Vue3 响应式 API）
+ * @param {Object|Function} source - 源对象或 getter 函数
+ * @param {string} key - 属性名
+ * @param {*} defaultValue - 默认值
+ * @returns {Ref} 返回一个 ref
+ *
+ * 作用：将响应式对象的某个属性转换为独立的 ref，保持与原属性的响应式关联
+ *
+ * 实现原理：
+ * 1. 如果 source 是 ref，直接返回
+ * 2. 如果 source 是函数，创建 GetterRefImpl
+ * 3. 如果 source 是对象且有 key 参数，创建 ObjectRefImpl（指向源对象的属性）
+ * 4. 否则创建普通 ref
+ *
+ * 使用场景：
+ * - 解构响应式对象时保持响应式（与 toRefs 类似，但只转换单个属性）
+ * - 在组合式函数中返回单个属性的 ref
+ * - 将响应式对象的属性传递给子组件
+ *
+ * 示例：
+ * ```js
+ * const state = reactive({ count: 0 })
+ * const countRef = toRef(state, 'count')
+ * countRef.value++ // 会更新 state.count
+ * ```
+ */
 function toRef(source, key, defaultValue) {
   if (isRef(source)) {
     return source;
@@ -1429,46 +2059,91 @@ function propertyToRef(source, key, defaultValue) {
   return isRef(val) ? val : new ObjectRefImpl(source, key, defaultValue);
 }
 
+/**
+ * ComputedRefImpl - computed 的实现类
+ * 负责实现计算属性的懒计算和缓存机制
+ */
 class ComputedRefImpl {
   constructor(getter, _setter, isReadonly, isSSR) {
-    this._setter = _setter;
-    this.dep = void 0;
-    this.__v_isRef = true;
-    this["__v_isReadonly"] = false;
-    this._dirty = true;
+    this._setter = _setter; // setter 函数
+    this.dep = void 0; // 依赖集合
+    this.__v_isRef = true; // 标记这是一个 ref
+    this["__v_isReadonly"] = false; // 是否只读
+    this._dirty = true; // 脏标记：true 表示需要重新计算
+    // 创建 effect，当 getter 的依赖变化时，将 _dirty 设为 true 并触发更新
     this.effect = new ReactiveEffect(getter, () => {
       if (!this._dirty) {
         this._dirty = true;
         triggerRefValue(this);
       }
     });
-    this.effect.computed = this;
-    this.effect.active = this._cacheable = !isSSR;
+    this.effect.computed = this; // 标记这是一个 computed effect
+    this.effect.active = this._cacheable = !isSSR; // 是否启用缓存
     this["__v_isReadonly"] = isReadonly;
   }
+
+  /**
+   * getter - 当访问 .value 时触发
+   * 作用：懒计算 + 缓存机制，只在需要时计算，且缓存结果
+   */
   get value() {
     const self = toRaw(this);
-    trackRefValue(self);
+    trackRefValue(self); // 收集依赖
+    // 如果是脏的或不可缓存，则重新计算
     if (self._dirty || !self._cacheable) {
       self._dirty = false;
-      self._value = self.effect.run();
+      self._value = self.effect.run(); // 执行 getter 函数
     }
     return self._value;
   }
+
+  /**
+   * setter - 当设置 .value 时触发
+   * 作用：调用 _setter 函数（仅可写的 computed 有 setter）
+   */
   set value(newValue) {
     this._setter(newValue);
   }
 }
+/**
+ * computed - 创建计算属性（Vue3 核心响应式 API）
+ * @param {Function|Object} getterOrOptions - getter 函数或包含 get/set 的对象
+ * @param {Object} debugOptions - 调试选项（开发环境使用）
+ * @param {boolean} isSSR - 是否在服务端渲染
+ * @returns {ComputedRef} 返回一个只读或可写的计算属性 ref
+ *
+ * 作用：创建一个基于响应式数据的计算值，具有懒计算和缓存特性
+ *
+ * 实现原理：
+ * 1. 如果传入的是函数，则作为 getter，创建只读 computed
+ * 2. 如果传入的是对象，包含 get 和 set，创建可写 computed
+ * 3. 创建 ComputedRefImpl 实例，传入 getter 和 setter
+ * 4. getter 的依赖变化时，不会立即重新计算，而是将 _dirty 设为 true
+ * 5. 只有在访问 .value 时，如果 _dirty 为 true 才会重新计算
+ * 6. 计算结果会被缓存，直到依赖再次变化
+ *
+ * 特性：
+ * - 懒计算：只有访问时才计算
+ * - 缓存：依赖不变时返回缓存值
+ * - 自动追踪：自动收集 getter 内部使用的响应式依赖
+ *
+ * 使用场景：
+ * - 派生状态：基于现有响应式数据计算新值
+ * - 复杂计算：避免在模板中写复杂表达式
+ * - 性能优化：缓存计算结果，避免重复计算
+ */
 function computed$1(getterOrOptions, debugOptions, isSSR = false) {
   let getter;
   let setter;
   const onlyGetter = isFunction(getterOrOptions);
   if (onlyGetter) {
+    // 只传入函数，创建只读 computed
     getter = getterOrOptions;
     setter = () => {
       console.warn("Write operation failed: computed value is readonly");
     } ;
   } else {
+    // 传入对象，创建可写 computed
     getter = getterOrOptions.get;
     setter = getterOrOptions.set;
   }
@@ -1708,6 +2383,33 @@ let postFlushIndex = 0;
 const resolvedPromise = /* @__PURE__ */ Promise.resolve();
 let currentFlushPromise = null;
 const RECURSION_LIMIT = 100;
+/**
+ * nextTick - 下次 DOM 更新循环结束之后执行延迟回调（Vue3 核心工具 API）
+ * @param {Function} fn - 要执行的回调函数
+ * @returns {Promise} 返回一个 Promise
+ *
+ * 作用：将回调推迟到下次 DOM 更新循环之后执行
+ *
+ * 实现原理：
+ * 1. 利用 Promise.resolve() 创建微任务
+ * 2. 将回调函数推入微任务队列
+ * 3. 在当前宏任务执行完毕后，微任务队列执行时调用回调
+ * 4. 如果传入函数，返回 Promise.then(fn)；否则返回 Promise
+ *
+ * 使用场景：
+ * - 在修改数据后立即操作 DOM（此时 DOM 还未更新）
+ * - 等待 Vue 完成所有数据变化后的 DOM 更新
+ * - 在数据变化后执行某些逻辑
+ *
+ * 示例：
+ * ```js
+ * const count = ref(0)
+ * count.value++
+ * nextTick(() => {
+ *   console.log('DOM 已更新，count 的最新值是:', count.value)
+ * })
+ * ```
+ */
 function nextTick(fn) {
   const p = currentFlushPromise || resolvedPromise;
   return fn ? p.then(this ? fn.bind(this) : fn) : p;
