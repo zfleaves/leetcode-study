@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-01-15 16:39:33
  * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-01-15 16:48:03
+ * @LastEditTime: 2026-02-03 14:22:17
  * @FilePath: \leetcode-study\write\debounce.js
  */
 // 支持立即执行的防抖

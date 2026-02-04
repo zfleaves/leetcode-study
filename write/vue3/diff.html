@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 diff</title>
+</head>
+
+<body>
+    <script>
+        // 简化版 Diff 算法
+        function diff(oldChildren, newChildren) {
+            const patches = [];
+            let i = 0;
+            let e1 = oldChildren.length - 1;
+            let e2 = newChildren.length - 1;
+
+            // 1. 从前往后同步
+            while (i <= e1 && i <= e2) {
+                if (sameNode(oldChildren[i], newChildren[i])) {
+                    patches.push({
+                        type: 'PATCH',
+                        oldNode: oldChildren[i],
+                        newNode: newChildren[i]
+                    });
+                    i++;
+                } else {
+                    break;
+                }
+            }
+
+            // 2. 从后往前同步
+            while (i <= e1 && i <= e2) {
+                if (sameNode(oldChildren[e1], newChildren[e2])) {
+                    patches.push({
+                        type: 'PATCH',
+                        oldNode: oldChildren[e1],
+                        newNode: newChildren[e2]
+                    });
+                    e1--;
+                    e2--;
+                } else {
+                    break;
+                }
+            }
+
+            // 3. 旧节点已处理完，新节点有剩余
+            if (i > e1) {
+                for (let j = i; j <= e2; j++) {
+                    patches.push({
+                        type: 'ADD',
+                        node: newChildren[j],
+                        index: j
+                    });
+                }
+            }
+            // 4. 新节点已处理完，旧节点有剩余
+            else if (i > e2) {
+                for (let j = i; j <= e1; j++) {
+                    patches.push({
+                        type: 'REMOVE',
+                        node: oldChildren[j]
+                    });
+                }
+            }
+            // 5. 处理未知序列
+            else {
+                const keyToNewIndexMap = new Map();
+                for (let j = i; j <= e2; j++) {
+                    keyToNewIndexMap.set(newChildren[j].key, j);
+                }
+
+                const newIndexToOldIndexMap = new Array(e2 - i + 1).fill(0);
+                let moved = false;
+                let maxNewIndexSoFar = 0;
+
+                for (let j = i; j <= e1; j++) {
+                    const oldNode = oldChildren[j];
+                    const newIndex = keyToNewIndexMap.get(oldNode.key);
+
+                    if (newIndex === undefined) {
+                        patches.push({
+                            type: 'REMOVE',
+                            node: oldNode
+                        });
+                    } else {
+                        newIndexToOldIndexMap[newIndex - i] = j + 1;
+                        if (newIndex >= maxNewIndexSoFar) {
+                            maxNewIndexSoFar = newIndex;
+                        } else {
+                            moved = true;
+                        }
+                    }
+                }
+
+                // 生成最长递增子序列
+                const increasingSequence = moved ? getSequence(newIndexToOldIndexMap) : [];
+                console.log(increasingSequence);
+                // 移动和挂载节点
+                let k = increasingSequence.length - 1;
+                for (let j = newIndexToOldIndexMap.length - 1; j >= 0; j--) {
+                    const newIndex = i + j;
+                    const newNode = newChildren[newIndex];
+
+                    if (newIndexToOldIndexMap[j] === 0) {
+                        patches.push({
+                            type: 'ADD',
+                            node: newNode,
+                            index: newIndex
+                        });
+                    } else if (moved) {
+                        if (k < 0 || j !== increasingSequence[k]) {
+                            patches.push({
+                                type: 'MOVE',
+                                node: newNode,
+                                index: newIndex
+                            });
+                        } else {
+                            k--;
+                        }
+                    }
+                }
+            }
+
+            return patches;
+        }
+
+        function sameNode(a, b) {
+            return a.key === b.key && a.type === b.type;
+        }
+
+        // 简化版最长递增子序列
+        function getSequence(arr) {
+            const result = [0];
+            const p = new Array(arr.length);
+
+            for (let i = 1; i < arr.length; i++) {
+                const val = arr[i];
+                if (val === 0) continue;
+
+                const last = arr[result[result.length - 1]];
+                if (val > last) {
+                    p[i] = result[result.length - 1];
+                    result.push(i);
+                    continue;
+                }
+
+                let left = 0;
+                let right = result.length - 1;
+                while (left < right) {
+                    const mid = Math.floor((left + right) / 2);
+                    if (arr[result[mid]] < val) {
+                        left = mid + 1;
+                    } else {
+                        right = mid;
+                    }
+                }
+
+                if (val < arr[result[left]]) {
+                    if (left > 0) {
+                        p[i] = result[left - 1];
+                    }
+                    result[left] = i;
+                }
+            }
+
+            const len = result.length;
+            let last = result[len - 1];
+            for (let i = len - 1; i >= 0; i--) {
+                result[i] = last;
+                last = p[last];
+            }
+
+            return result;
+        }
+
+        // 使用示例
+        const oldChildren = [{
+                key: 'A',
+                type: 'div'
+            },
+            {
+                key: 'B',
+                type: 'div'
+            },
+            {
+                key: 'C',
+                type: 'div'
+            },
+            {
+                key: 'D',
+                type: 'div'
+            }
+        ];
+
+        const newChildren = [{
+                key: 'D',
+                type: 'div'
+            },
+            {
+                key: 'A',
+                type: 'div'
+            },
+            {
+                key: 'C',
+                type: 'div'
+            },
+            {
+                key: 'E',
+                type: 'div'
+            }
+        ];
+
+        const patches = diff(oldChildren, newChildren);
+        console.log(patches);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!--
+ * @Date: 2026-01-30 10:54:05
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2026-02-01 19:09:49
+ * @FilePath: \leetcode-study\write\test.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {string} s
+         * @return {number}
+         */
+        var lengthOfLongestSubstring = function (s) {
+            const n = s.length;
+            if (n === 1) return 1;
+            let ans = 0;
+            for (let slow = 0; slow < n; slow++) {
+                let res = s[slow];
+                let fast = slow + 1;
+                while (fast < n && res.indexOf(s[fast] < 0)) {
+                    res += s[fast];
+                    fast++;
+                }
+                ans = Math.max(ans, fast - slow + 1);
+            }
+            return ans;
+        };
+        console.log(lengthOfLongestSubstring('abcabcbb'));
+    </script>
+</body>
+
+</html>

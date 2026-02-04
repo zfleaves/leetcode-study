@@ -2,5 +2,7 @@
     "marscode.chatLanguage": "cn",
     "marscode.codeCompletionPro": {
         "enableCodeCompletionPro": false
-    }
+    },
+    "trae.tab.enableRename": false,
+    "trae.tab.enableAutoImport": false,
 }

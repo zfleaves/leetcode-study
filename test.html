@@ -1,7 +1,7 @@
 <!--
  * @Date: 2024-05-18 22:03:00
  * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-01-16 21:18:29
+ * @LastEditTime: 2026-01-29 23:36:37
  * @FilePath: \leetcode-study\test.html
 -->
 <!DOCTYPE html>
@@ -247,7 +247,117 @@
         }
         return nSumTarget(nums, n, 0, target)
       }
-      console.log(fourSum([1,0,-1,0,-2,2], 0));
+      console.log(fourSum([1, 0, -1, 0, -2, 2], 0));
+
+      var checkInclusion = function (s1, s2) {
+        const n = s1.length,
+          m = s2.length;
+        if (n > m) {
+          return false;
+        }
+        const cnt = new Array(26).fill(0);
+        for (let i = 0; i < n; ++i) {
+          cnt[s1[i].charCodeAt() - 'a'.charCodeAt()]--;
+        }
+        let left = 0;
+        for (let right = 0; right < m; ++right) {
+          const x = s2[right].charCodeAt() - 'a'.charCodeAt();
+          cnt[x]++;
+          while (cnt[x] > 0) {
+            cnt[s2[left].charCodeAt() - 'a'.charCodeAt()]--;
+            left++;
+          }
+          if (right - left + 1 === n) {
+            return true;
+          }
+        }
+        return false;
+      };
+      console.log(checkInclusion("ab", "eidbaooo"));
+
+      function minWindow(s, t) {
+        // 统计 t 中每个字符需要的次数
+        const need = new Map();
+        for (let c of t) {
+          need.set(c, (need.get(c) || 0) + 1);
+        }
+
+        // 滑动窗口统计
+        const window = new Map();
+        let left = 0;
+        let valid = 0; // 匹配的字符种类数
+        let start = 0; // 最小覆盖子串的起始位置
+        let minLen = Infinity; // 最小覆盖子串的长度
+
+        for (let right = 0; right < s.length; right++) {
+          const c = s[right];
+
+          // 更新窗口
+          if (need.has(c)) {
+            window.set(c, (window.get(c) || 0) + 1);
+            if (window.get(c) === need.get(c)) {
+              valid++;
+            }
+          }
+
+          // 判断左侧窗口是否要收缩
+          while (valid === need.size) {
+            // 更新最小覆盖子串
+            if (right - left + 1 < minLen) {
+              start = left;
+              minLen = right - left + 1;
+            }
+
+            // d 是将移出窗口的字符
+            const d = s[left];
+
+            // 如果移出的字符是 t 中的字符
+            if (need.has(d)) {
+              if (window.get(d) === need.get(d)) {
+                valid--;
+              }
+              window.set(d, window.get(d) - 1);
+            }
+
+            // 左移窗口
+            left++;
+          }
+        }
+
+        // 返回结果
+        return minLen === Infinity ? "" : s.substring(start, start + minLen);
+      }
+      console.log(minWindow("ADOBECODEBANC", "ABC"));
+
+      var firstMissingPositive = function (nums) {
+        nums = nums.sort((a, b) => a - b).filter(v => v > 0)
+        console.log(nums)
+        if (nums[0] > 1) return 1
+        let n = nums.length
+        let num = 0
+        for (let i = 0; i < n - 1; i++) {
+          if (nums[i + 1] > nums[i] + 1) {
+            num = nums[i] + 1
+            return num
+          }
+        }
+        console.log(num)
+        return nums[n - 1] + 1 > 0 ? nums[n - 1] + 1 : 1
+      };
+      console.log(firstMissingPositive([3, 4, -1, 1]))
+
+      var moveZeroes = function (nums) {
+        const n = nums.length;
+        let r = n - 1;
+        for (let i = 0; i < n; i++) {
+          if (nums[i] === 0) {
+            [nums[i], nums[r]] = [nums[r], nums[i]];
+            r--;
+          }
+        }
+        return nums;
+      };
+      console.log(moveZeroes([0,1,0,3,12]))
     </script>
   </body>
 

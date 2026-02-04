@@ -1,3 +1,9 @@
+/*
+ * @Date: 2024-06-26 12:26:11
+ * @LastEditors: zhangming 1051403128@qq.com
+ * @LastEditTime: 2026-01-28 19:28:15
+ * @FilePath: \leetcode-study\华为write\promise\promise.js
+ */
 class MyPromise {
     constructor(executor) {
         this.status = 'pending'
