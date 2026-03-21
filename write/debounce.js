@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-01-15 16:39:33
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-02-03 14:22:17
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-25 10:24:54
  * @FilePath: \leetcode-study\write\debounce.js
  */
 // 支持立即执行的防抖
@@ -48,3 +48,23 @@ function debounce(fn, delay, immediate = false) {
 const debouncedSubmit = debounce(function(data) {
   console.log('提交:', data);
 }, 1000, true);
+
+function throttled(Fn, delay) {
+  let timer = null;
+  let start = Date.now();
+  return function () {
+    if (timer) clearTimeout(timer);
+    let cur = Date.now();
+    let remain = delay - (cur - start);
+    let context = this;
+    let args = arguments;
+    if (remain >= 0) {
+      timer = setTimeout(function() {
+        Fn.apply(context, args);
+      }, remain)
+    } else {
+      Fn.apply(context, args);
+      start = Date.now();
+    }
+  }
+}

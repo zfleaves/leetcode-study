@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-01-28 21:01:05
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-01-28 21:12:32
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-03-19 13:23:32
  * @FilePath: \leetcode-study\write\changeThis.js
  * @Description: 手动实现 Function.prototype 上的 apply、call、bind 方法
  */
@@ -26,7 +26,13 @@ Function.prototype.myApply = function (context, args) {
     delete context.fn;
     return result;
 }
-
+Function.prototype.myApply1 = function (context, args) {
+    context = context || window;
+    context.fn = this;
+    const result = args ? context.fn(args) : context.fn();
+    delete context.fn;
+    return result;
+}
 /**
  * 实现 call 方法
  * 功能：调用函数，并指定函数内部的 this 值，参数以列表形式传入
@@ -69,4 +75,22 @@ Function.prototype.myBind = function (context) {
         // instanceof 检查：this instanceof self 可以判断是否通过 new 调用
         return self.apply(this instanceof Fn ? new self(...arguments) : context, args.concat(...arguments)); 
     };
+}
+
+
+
+
+
+
+
+
+
+function myBind(context) {
+    context = context || window;
+    const args = [...arguments].slice(1);
+
+    const self = this;
+    return function Fn() {
+        return self.apply(this instanceof Fn ? new self(...arguments) : context, args.concat(...arguments));
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2026-01-29 22:12:46
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-01-29 22:18:48
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-25 10:04:28
  * @FilePath: \leetcode-study\write\compose.js
  */
 /**
@@ -38,3 +38,20 @@ const calc = compose(add2, divide3, square);
 
 // 执行过程：4*4=16 →16/3≈5.333 →5.333+2≈7.333
 console.log(calc(4)); // 输出：≈7.333333333333333
+
+function compose1(...fns) {
+    return function (initialValue) {
+        let result = initialValue;
+        for (let i = fns.length - 1; i >=0; i--) {
+            const currentFunc = fns[i];
+            result = currentFunc(initialValue);
+        }
+        return result;
+    }
+}
+
+
+// 管道
+const pipe = (...funcs) => (val) => funcs.reduce((acc, fn) => fn(acc), val);
+// 组合
+const composeArrow = (...funcs) => (val) => funcs.reverse().reduce((acc, fn) => fn(acc), val);

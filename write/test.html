@@ -1,7 +1,7 @@
 <!--
  * @Date: 2026-01-30 10:54:05
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-02-01 19:09:49
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-26 10:59:38
  * @FilePath: \leetcode-study\write\test.html
 -->
 <!DOCTYPE html>
@@ -35,6 +35,102 @@
             return ans;
         };
         console.log(lengthOfLongestSubstring('abcabcbb'));
+
+        var obj = {
+            say() { console.log(this.name); },
+            name: 'Will',
+        };
+        const fn = obj.say;
+        fn();
+
+        var dailyTemperatures = function (temperatures) {
+            const n = temperatures.length;
+            const ans = Array(n).fill(0);
+            const st = []; // todolist
+            for (let i = 0; i < n; i++) {
+                const t = temperatures[i];
+                while (st.length && t > temperatures[st[st.length - 1]]) {
+                    const j = st.pop();
+                    ans[j] = i - j;
+                }
+                st.push(i);
+            }
+            return ans;
+        };
+        const temperatures = [73, 74, 75, 71, 69, 72, 76, 73]
+        console.log(dailyTemperatures(temperatures), 'dailyTemperatures')
+
+
+        /**
+     * @param {string} s
+     * @return {string}
+     */
+        var reverseWords = function (s) {
+            let res = '';
+            let i = s.length - 1;
+            while (i >= 0) {
+                while (s[i] === ' ') {
+                    i--;
+                }
+                let j = i;
+                // console.log(i)
+                while (j >= 0 && s[j] !== ' ') {
+                    // console.log(s[j])
+                    j--;
+                }
+                // console.log(j)
+                res += s.slice(j, i + 1)
+                i = j;
+            }
+            return res;
+        };
+        console.log(reverseWords("the sky is blue"))
+
+        var plusOne = function (digits) {
+            for (let i = digits.length - 1; i >= 0; i--) {
+                if (digits[i] < 9) {
+                    digits[i]++; // 进位
+                    return digits;
+                }
+                digits[i] = 0; // 进位数字的右边数字都变成 0
+            }
+            // digits 全是 9，加一后变成 100...00
+            digits.push(0);
+            digits[0] = 1;
+            return digits;
+        };
+        console.log(plusOne([4, 3, 2, 9]))
+
+        var findLongestConsecutiveSubstring = function (s) {
+            const n = s.length;
+            if (n <= 1) return n;
+            let i = 0;
+            let maxlength = 1;
+            let res = '';
+            while (i < n) {
+                let j = i;
+                while (j < n && s[i] === s[j]) {
+                    j++;
+                }
+                if (j - i + 1 > maxlength) {
+                    maxlength = j - i + 1;
+                    res = s.slice(i, j);
+                }
+                i = j;
+            }
+            return res;
+        }
+        console.log(findLongestConsecutiveSubstring('abbbcccddddde'));
+        // 普通函数
+        function normalFn() {
+            console.log(this); // 指向全局对象
+        }
+
+        const obj1 = { name: '测试' };
+        obj1.fn = normalFn;
+        obj1.fn(); // 输出全局对象 window
+
+
     </script>
 </body>
 

@@ -1,7 +1,13 @@
 /*
+ * @Date: 2026-02-06 12:03:03
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-26 16:40:50
+ * @FilePath: \leetcode-study\write\findShortRtt.js
+ */
+/*
  * @Date: 2026-02-03 14:05:37
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2026-02-03 14:37:42
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-26 16:17:17
  * @FilePath: \leetcode-study\write\findShortRtt.js
  */
 /*
@@ -50,7 +56,7 @@ async function race(ips, maxTime) {
         }, maxTime);
         let start = Date.now();
         for (const ip of ips) {
-            fetch(`http:${ip}/ping`, { signal }).then(() => {
+            fetch(`http:${ip}/ping`, { signal, method: 'get' }).then(() => {
                 const rtt = Date.now() - start;
                 resolve({
                     rtt,

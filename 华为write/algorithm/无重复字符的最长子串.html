@@ -1,8 +1,8 @@
 <!--
  * @Date: 2024-05-21 19:00:51
- * @LastEditors: zhangming 1051403128@qq.com
- * @LastEditTime: 2024-06-29 15:32:49
- * @FilePath: \leetcode-study\write\algorithm\无重复字符的最长子串.html
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-06 13:07:13
+ * @FilePath: \leetcode-study\华为write\algorithm\无重复字符的最长子串.html
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +20,20 @@
 </head>
 
 <body>
-    <div class="elfjS" data-track-load="description_content"><p>给定一个字符串 <code>s</code> ，请你找出其中不含有重复字符的&nbsp;<strong>最长 <span data-keyword="substring-nonempty" class=" cursor-pointer relative text-dark-blue-s text-sm"><div class="popover-wrapper inline-block" data-headlessui-state=""><div><div aria-expanded="false" data-headlessui-state="" id="headlessui-popover-button-:rnk:"><div>子串</div></div><div style="position: fixed; z-index: 40; inset: 0px auto auto 0px; transform: translate(405px, 183px);"></div></div></div></span></strong><strong>&nbsp;</strong>的长度。</p>
+    <div class="elfjS" data-track-load="description_content">
+        <p>给定一个字符串 <code>s</code> ，请你找出其中不含有重复字符的&nbsp;<strong>最长 <span data-keyword="substring-nonempty"
+                    class=" cursor-pointer relative text-dark-blue-s text-sm">
+                    <div class="popover-wrapper inline-block" data-headlessui-state="">
+                        <div>
+                            <div aria-expanded="false" data-headlessui-state="" id="headlessui-popover-button-:rnk:">
+                                <div>子串</div>
+                            </div>
+                            <div
+                                style="position: fixed; z-index: 40; inset: 0px auto auto 0px; transform: translate(405px, 183px);">
+                            </div>
+                        </div>
+                    </div>
+                </span></strong><strong>&nbsp;</strong>的长度。</p>
 
         <p>&nbsp;</p>
 
@@ -64,12 +77,13 @@
          * @param {string} s
          * @return {number}
          */
-        var lengthOfLongestSubstring = function(s) {
+        var lengthOfLongestSubstring = function (s) {
             let ock = new Set()
             let str = new Set()
             let rk = -1
             let ans = 0
-            let n = s.length
+            let n = s.length;
+            let res = [];
             for (let i = 0; i < n; i++) {
                 if (i !== 0) {
                     ock.delete(s[i - 1])
@@ -78,9 +92,22 @@
                     ock.add(s.charAt(rk + 1))
                     rk++
                 }
-                ans = Math.max(ans, rk - i + 1)
+                ans = Math.max(ans, rk - i + 1);
+                if (res.length === 0) {
+                    res.push(s.slice(i, rk + 1))
+                } else {
+                    const tempStr = res[res.length - 1];
+                    const addStr = s.slice(i, rk + 1);
+                    if (tempStr.length === addStr.length && tempStr !== addStr) {
+                        res.push(addStr);
+                    } else if (tempStr.length < addStr.length) {
+                        res.shift();
+                        res.push(addStr);
+                    }
+                }
                 str.add(s.slice(i, rk + 1))
             }
+            console.log(res, 'res');
             console.log('%c 🍒 str: ', 'font-size:20px;background-color: #6EC1C2;color:#fff;', str);
             return ans
         };

@@ -1,22 +1,32 @@
+/*
+ * @Date: 2026-02-06 12:03:03
+ * @LastEditors: zengfa 1051403128@qq.com
+ * @LastEditTime: 2026-02-27 10:55:30
+ * @FilePath: \leetcode-study\write\Promise.js
+ */
+const PENDING = 'PENDING';
+const FULFILLED = 'fulfilled';
+const REJECTED = 'rejected';
+
 class MyPromise {
     constructor(executor) {
-        this.state = 'pending';
+        this.state = PENDING;
         this.value = undefined;
         this.reason = undefined;
         this.onResolveCallbacks = [];
         this.onRejectCallbacks = [];
 
         const resolve = (value) => {
-            if (this.state === 'pending') {
-                this.state = 'fulfilled';
+            if (this.state === PENDING) {
+                this.state = FULFILLED;
                 this.reason = value;
                 this.onResolveCallbacks.forEach(cb => cb(value));
             }
         }
 
         const reject = (reason) => {
-            if (this.state === 'pending') {
-                this.state = 'reject';
+            if (this.state === PENDING) {
+                this.state = REJECTED;
                 this.reason = reason;
                 this.onRejectCallbacks.forEach(cb => cb(reason));
             }
@@ -40,7 +50,7 @@ class MyPromise {
     }
 
     then(onFulfilled, onRejected) {
-        if (this.state === 'fulfilled') {
+        if (this.state === FULFILLED) {
             try {
                 const result = onFulfilled ? onFulfilled(this.value) : this.value;
                 if (result instanceof MyPromise) {
@@ -51,7 +61,7 @@ class MyPromise {
             } catch (error) {
                 reject(error);
             }
-        } else if (this.state === 'reject') {
+        } else if (this.state === REJECTED) {
             try {
                 const result = onRejected ? onRejected(this.reason) : this.reason;
                 if (result instanceof MyPromise) {
@@ -129,7 +139,7 @@ class MyPromise {
         return new MyPromise((resolve, reject) => {
             let count = 0
             let result = []
-            const processData = (value, index) => {
+            const processData = (value, index, state) => {
                 count++;
                 result[index] = {
                     value,
@@ -141,10 +151,17 @@ class MyPromise {
             }
             promises.forEach((promise, index) => {
                 MyPromise(promise).then(
-                    value => processData(value, index, 'fulfilled'),
-                    reason => processData(reason, index, 'reject')
+                    value => processData(value, index, FULFILLED),
+                    reason => processData(reason, index, REJECTED)
                 )
             })
         })
+    }
+
+    finally(callback) {
+        return this.then(
+            value => MyPromise.resolve(callback()).then(() => value),
+            reason => MyPromise.reject(callback()).then(() => { throw reason })
+        )
     }
 }
